@@ -1,0 +1,10 @@
+console.time('time');
+console.log(__filename);
+console.log(__dirname);
+console.log('log');
+console.info('info');
+console.error('error');
+console.warn('warn');
+console.dir({a:1,b:2});
+console.trace();
+console.timeEnd('time');

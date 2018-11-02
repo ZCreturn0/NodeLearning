@@ -7,6 +7,7 @@ http.createServer(function(req,res){
     if (pathname != '/favicon.ico'){
         var filename = pathname.substr(1);
         fs.readFile(filename,function(err,data){
+            console.log(filename);
             var suffixName = filename.substr(filename.lastIndexOf("."));
             if (err) {
                 res.writeHead(404, { 'Content-Type': 'text/plain' });

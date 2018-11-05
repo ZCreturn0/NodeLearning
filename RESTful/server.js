@@ -36,6 +36,20 @@ app.get('/addUser',function(req,res){
     });
 })
 
+//删
+app.get('/deleteUser', function (req, res) {
+    fs.readFile(path.join(__dirname, 'data/user.json'), function (err, data) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            var json = JSON.parse(data);
+            delete json['user'+req.query.id];
+            res.end(JSON.stringify(json));
+        }
+    });
+})
+
 //查
 app.get('/:user',function(req,res){
     fs.readFile(path.join(__dirname, 'data/user.json'), function (err, data) {

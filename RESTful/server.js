@@ -15,6 +15,26 @@ app.get('/',function(req,res){
     });
 })
 
+app.get('/addUser',function(req,res){
+    fs.readFile(path.join(__dirname, 'data/user.json'), function (err, data) {
+        var userNew = {
+            "id": 10,
+            "name": "zzz",
+            "age": 12,
+            "addr": "ZZZ"
+        }
+        if (err) {
+            console.log(err);
+        }
+        else {
+            var json = JSON.parse(data);
+            json.userNew = userNew;
+            console.log(json);
+            res.end(JSON.stringify(json));
+        }
+    });
+})
+
 //404
 app.get('/*',function(req,res){
 

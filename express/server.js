@@ -3,6 +3,8 @@ const path = require('path');
 // const bodyParser = require('body-parser');
 const multer = require('multer');
 const fs = require('fs');
+const cookieParser = require('cookie-parser');
+const util = require('util');
 
 const app = express();
 
@@ -10,6 +12,7 @@ const app = express();
 app.use(express.static('images'));
 //目录;上传控件的'name';个数,最终存在一个数组里
 app.use(multer({ dest: './upload' }).array('file',4));
+app.use(cookieParser());
 // app.use(bodyParser.urlencoded({extended:false}));
 
 app.get('/',function(req,res){
@@ -78,9 +81,11 @@ app.post('/upload_file',function(req,res){
             });
         }
     });
-
-
     res.end(saveFilename);
+})
+
+app.get('/show_cookie', function (req, res) {
+    res.end(util.inspect(req.cookies));
 })
 
 app.get('/*', function (req, res) {

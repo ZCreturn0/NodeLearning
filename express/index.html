@@ -7,10 +7,14 @@
     <title>Document</title>
 </head>
 <body>
-    <form action='http://127.0.0.1:8888/process_get' method="GET">
+    <!-- <form action='http://127.0.0.1:8888/process_get' method="GET">
         <input type='text' name='name'/>
         <input type="text" name='addr'/>
         <input type="submit"/>
+    </form> -->
+    <form action='http://127.0.0.1:8888/upload_file' method="POST" enctype="multipart/form-data">
+        <input type='file' name='file' />
+        <input type="submit" />
     </form>
 </body>
 </html>

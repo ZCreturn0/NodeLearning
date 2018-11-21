@@ -51,6 +51,7 @@ app.get('/deleteUser', function (req, res) {
 })
 
 //查
+//必须放最后,':user'可匹配所有情况
 app.get('/:user',function(req,res){
     fs.readFile(path.join(__dirname, 'data/user.json'), function (err, data) {
         if (err) {

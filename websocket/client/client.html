@@ -10,7 +10,7 @@
     <script>
         const ws = new WebSocket('ws://127.0.0.1:8888');
         ws.onopen = () => {
-            ws.send('hello');
+            ws.send('say goodbye to hanser');
             console.log(11111)
         }
         ws.onmessage = (message) => {

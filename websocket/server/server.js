@@ -11,7 +11,13 @@ ws.on('connection', (socket) => {
     });
     // 必须关闭连接,否则强制退出后这个端口会一直被占用
     setInterval(() => {
+        console.log('done');
         socket.close();
         ws.close();
     }, 10 * 1000);
 });
+
+ws.on('close', () => {
+    console.log('close');
+    process.exit();
+})

@@ -26,8 +26,6 @@
             width: 100%;
             height: calc(100% - 106px);
         }
-
-
         .input{
             background: #ccc;
             padding: 5px 10px;
@@ -37,6 +35,8 @@
             resize: none;
             height: 50px;
             font-size: 16px;
+            /* 部分手机focus时蓝底 */
+            background: #fff;
         }
         .input > .sendBtn{
             min-width: 40px;
@@ -61,18 +61,33 @@
         </div>
     </div>
     <script>
-        // const ws = new WebSocket('ws://127.0.0.1:8888');
-        // ws.onopen = () => {
-        //     ws.send(JSON.stringify({
-        //         name: 'aaaaa',
-        //         text: 'say goodbye to hanser'
-        //     }));
-        //     console.log(11111)
-        // }
+        let userName = '';
+        while(!userName){
+            userName = prompt("请输入用户名:");
+        }
+        const ws = new WebSocket('ws://127.0.0.1:8888');
+        ws.onopen = () => {
+            // 发送登录命令
+            ws.send(JSON.stringify({
+                order: 'login',
+                name: userName
+            }));
+            console.log(`${userName} 进入了聊天室`);
+            addContent(0, {
+                user: userName
+            });
+        }
         // ws.onmessage = (message) => {
         //     console.log(message);
         //     console.log(JSON.parse(message.data));
         // }
+        /**
+         * @description 添加消息
+         * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
+        */
+        function addContent(type, {user, msg}){
+
+        }
     </script>
 </body>
 </html>

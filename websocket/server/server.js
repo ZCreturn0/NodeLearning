@@ -1,16 +1,28 @@
 const Server = require('ws').Server;
+const IP = '192.168.1.102';
+const PORT = 8888;
 const ws = new Server({
-    port: 8888
+    port: PORT
 });
 
-console.log('websocket running in ws://127.0.0.1:8888');
+console.log(`websocket running in ws://${IP}:${PORT}`);
+
+// 存储所有的连接
+let sockets = [];
 
 ws.on('connection', (socket) => {
-    console.log('connection incomming');
+    sockets.push(socket);
     socket.on('message', (message) => {
         let msg = JSON.parse(message);
-        socket.send(JSON.stringify(msg));
-        console.log(msg);
+        console.log(msg.user);
+        switch(msg.type){
+            case 0:
+                sockets.forEach(item => {
+                    socketSendObject(item, msg);
+                });
+                break;
+        }
+        // 退出条件
         if (msg.text === 'say goodbye to hanser' || msg.text === 'hanser says goodbye') {
             console.log('goodbye hanser');
             socket.close();
@@ -29,3 +41,8 @@ ws.on('close', () => {
     console.log('websocket closed');
     process.exit();
 })
+
+// 使用 socket 发送对象
+function socketSendObject(socket, obj) {
+    socket.send(JSON.stringify(obj));
+}

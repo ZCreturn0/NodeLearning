@@ -8,9 +8,10 @@ console.log('websocket running in ws://127.0.0.1:8888');
 ws.on('connection', (socket) => {
     console.log('connection incomming');
     socket.on('message', (message) => {
-        socket.send(message);
-        console.log(message);
-        if (message === 'say goodbye to hanser' || message === 'hanser says goodbye') {
+        let msg = JSON.parse(message);
+        socket.send(JSON.stringify(msg));
+        console.log(msg);
+        if (msg.text === 'say goodbye to hanser' || msg.text === 'hanser says goodbye') {
             console.log('goodbye hanser');
             socket.close();
             ws.close();

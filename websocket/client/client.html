@@ -91,6 +91,10 @@
             // 往聊天框输出信息
             addContent(msg.type, msg);
         }
+        // 页面卸载
+        window.onbeforeunload = function(event) {
+            // ws.close();
+        };
         /**
          * @description 添加消息
          * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言

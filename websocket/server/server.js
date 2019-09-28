@@ -12,6 +12,7 @@ let sockets = [];
 
 ws.on('connection', (socket) => {
     sockets.push(socket);
+    console.log(socket);
     socket.on('message', (message) => {
         let msg = JSON.parse(message);
         switch(msg.type){
@@ -29,6 +30,9 @@ ws.on('connection', (socket) => {
             ws.close();
         }
     });
+    socket.on('close', () => {
+        console.log('已关闭');
+    })
     // 必须关闭连接,否则强制退出后这个端口会一直被占用
     // setInterval(() => {
     //     console.log('done');

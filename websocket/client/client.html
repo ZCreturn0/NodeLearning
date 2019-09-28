@@ -49,6 +49,14 @@
             right: 10px;
             bottom: 10px;
         }
+        /* 进入聊天室 */
+        .enter{
+            font-size: 14px;
+            text-align: center;
+        }
+        .enter > .user{
+            color: #0a6cff;
+        }
     </style>
 </head>
 <body>
@@ -61,11 +69,13 @@
         </div>
     </div>
     <script>
+        const IP = '192.168.1.102';
+        const PORT = 8888;
         let userName = '';
         while(!userName){
             userName = prompt("请输入用户名:");
         }
-        const ws = new WebSocket('ws://127.0.0.1:8888');
+        const ws = new WebSocket(`ws://${IP}:${PORT}`);
         ws.onopen = () => {
             // 发送登录命令
             ws.send(JSON.stringify({
@@ -86,7 +96,15 @@
          * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
         */
         function addContent(type, {user, msg}){
-
+            let content = document.getElementsByClassName('content')[0];
+            switch(type){
+                case 0:
+                    let enter = document.createElement('div');
+                    enter.classList = 'enter';
+                    enter.innerHTML = `<span class="user">${user}</span> 进入了聊天室`;
+                    content.append(enter);
+                    break;
+            }
         }
     </script>
 </body>

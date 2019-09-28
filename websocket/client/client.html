@@ -78,19 +78,18 @@
         const ws = new WebSocket(`ws://${IP}:${PORT}`);
         ws.onopen = () => {
             // 发送登录命令
-            ws.send(JSON.stringify({
-                order: 'login',
-                name: userName
-            }));
-            console.log(`${userName} 进入了聊天室`);
-            addContent(0, {
+            wsSendObject(ws, {
+                type: 0,
                 user: userName
             });
         }
-        // ws.onmessage = (message) => {
-        //     console.log(message);
-        //     console.log(JSON.parse(message.data));
-        // }
+        // 所有消息添加都在收到消息后添加
+        ws.onmessage = (message) => {
+            let msg = JSON.parse(message.data);
+            console.log(msg);
+            // 往聊天框输出信息
+            addContent(msg.type, msg);
+        }
         /**
          * @description 添加消息
          * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
@@ -99,12 +98,17 @@
             let content = document.getElementsByClassName('content')[0];
             switch(type){
                 case 0:
+                    console.log(user)
                     let enter = document.createElement('div');
                     enter.classList = 'enter';
                     enter.innerHTML = `<span class="user">${user}</span> 进入了聊天室`;
                     content.append(enter);
                     break;
             }
+        }
+        // 使用 websocket 发送对象
+        function wsSendObject(ws, obj){
+           ws.send(JSON.stringify(obj)); 
         }
     </script>
 </body>

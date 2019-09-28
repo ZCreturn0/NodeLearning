@@ -14,7 +14,6 @@ ws.on('connection', (socket) => {
     sockets.push(socket);
     socket.on('message', (message) => {
         let msg = JSON.parse(message);
-        console.log(msg.user);
         switch(msg.type){
             case 0:
                 sockets.forEach(item => {
@@ -22,6 +21,7 @@ ws.on('connection', (socket) => {
                 });
                 break;
         }
+        console.log(`当前有 ${sockets.length} 个用户在线`);
         // 退出条件
         if (msg.text === 'say goodbye to hanser' || msg.text === 'hanser says goodbye') {
             console.log('goodbye hanser');

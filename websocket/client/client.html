@@ -5,21 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .chat{
+            width: 40%;
+            height: 80vh;
+            border: 1px solid #000;
+            margin: 20px auto;
+            border-radius: 20px;
+        }
+        .title{
+            font-size: 20px;
+            text-align: center;
+            line-height: 40px;
+            color: #fff;
+            background: #3c715d;
+            border-radius: 20px 20px 0 0;
+        }
+
+
+
+        .input{
+            background: #ccc;
+            padding: 5px 10px;
+        }
+        .input > textarea{
+            width: 80%;
+            resize: none;
+        }
+        .input > .sendBtn{
+            display: inline-block;
+            min-width: 40px;
+            padding: 5px 10px;
+            background: #3c715d;
+            text-align: center;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
+    <div class="chat">
+        <div class="title">聊天室</div>
+        <div class="content"></div>
+        <div class="input">
+            <textarea name="send" id="send"></textarea>
+            <div class="sendBtn">发送</div>
+        </div>
+    </div>
     <script>
-        const ws = new WebSocket('ws://127.0.0.1:8888');
-        ws.onopen = () => {
-            ws.send(JSON.stringify({
-                name: 'aaaaa',
-                text: 'say goodbye to hanser'
-            }));
-            console.log(11111)
-        }
-        ws.onmessage = (message) => {
-            console.log(message);
-            console.log(JSON.parse(message.data));
-        }
+        // const ws = new WebSocket('ws://127.0.0.1:8888');
+        // ws.onopen = () => {
+        //     ws.send(JSON.stringify({
+        //         name: 'aaaaa',
+        //         text: 'say goodbye to hanser'
+        //     }));
+        //     console.log(11111)
+        // }
+        // ws.onmessage = (message) => {
+        //     console.log(message);
+        //     console.log(JSON.parse(message.data));
+        // }
     </script>
 </body>
 </html>

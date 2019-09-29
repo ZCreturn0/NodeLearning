@@ -58,6 +58,16 @@
         .enter > .user{
             color: #0a6cff;
         }
+        /* 离开聊天室 */
+        .leave{
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            color: #ccc;
+        }
+        .leave > .user{
+            color: #0a6cff;
+        }
     </style>
 </head>
 <body>
@@ -98,7 +108,8 @@
             // 发送离开命令,关闭连接
             wsSendObject(ws, {
                 type: 1,
-                id: uuid
+                id: uuid,
+                user: userName
             });
             ws.close();
         };
@@ -116,6 +127,12 @@
                     enter.classList = 'enter';
                     enter.innerHTML = `<span class="user">${user}</span> 进入了聊天室`;
                     content.append(enter);
+                    break;
+                case 1:
+                    let leave = document.createElement('div');
+                    leave.classList = 'leave';
+                    leave.innerHTML = `<span class="user">${user}</span> 离开了聊天室`;
+                    content.append(leave);
                     break;
             }
         }

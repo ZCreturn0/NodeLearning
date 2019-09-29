@@ -18,10 +18,11 @@ ws.on('connection', (socket) => {
         id: id,
         socket: socket
     });
-    console.log("aaa---size:" + ws.clients.size);
+    // console.log("aaa---size:" + ws.clients.size);
     socket.on('message', (message) => {
         let msg = JSON.parse(message);
-        console.log(msg);
+        // console.log(msg);
+        // 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
         switch(msg.type){
             case 0:
                 msg.id = id;
@@ -34,11 +35,17 @@ ws.on('connection', (socket) => {
                     if (item.id === msg.id) {
                         item.socket.close();
                         sockets.splice(index, 1);
+                        sockets.forEach(item => {
+                            socketSendObject(item.socket, {
+                                type: 1,
+                                user: msg.user
+                            });
+                        });
                     }
                 });
         }
         // console.log(ws.);
-        console.log(`bbb---当前有 ${sockets.length} 个用户在线`);
+        console.log(`当前有 ${sockets.length} 个用户在线`);
         // 退出条件
         // if (msg.text === 'say goodbye to hanser' || msg.text === 'hanser says goodbye') {
         //     console.log('goodbye hanser');
@@ -47,8 +54,8 @@ ws.on('connection', (socket) => {
         // }
     });
     socket.on('close', () => {
-        console.log('ccc---已关闭');
-        console.log("ddd---size:" + ws.clients.size);
+        console.log('已关闭1条连接');
+        // console.log("ddd---size:" + ws.clients.size);
     })
     // 必须关闭连接,否则强制退出后这个端口会一直被占用
     // setInterval(() => {

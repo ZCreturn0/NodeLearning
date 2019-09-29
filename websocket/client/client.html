@@ -70,9 +70,11 @@
         </div>
     </div>
     <script>
-        const IP = '192.168.1.102';
+        const IP = '192.168.75.120';
         const PORT = 8888;
         let userName = '';
+        // 用户 id
+        let uuid = '';
         while(!userName){
             userName = prompt("请输入用户名:");
         }
@@ -93,18 +95,23 @@
         }
         // 页面卸载
         window.onbeforeunload = function(event) {
-            console.log(11111)
+            // 发送离开命令,关闭连接
+            wsSendObject(ws, {
+                type: 1,
+                id: uuid
+            });
             ws.close();
         };
         /**
          * @description 添加消息
          * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
         */
-        function addContent(type, {user, msg}){
+        function addContent(type, {user, msg, id}){
             let content = document.getElementsByClassName('content')[0];
             switch(type){
                 case 0:
-                    console.log(user)
+                    // 存储 uuid, 用于识别连接
+                    uuid = id;
                     let enter = document.createElement('div');
                     enter.classList = 'enter';
                     enter.innerHTML = `<span class="user">${user}</span> 进入了聊天室`;

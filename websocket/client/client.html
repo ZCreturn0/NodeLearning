@@ -49,6 +49,9 @@
             right: 10px;
             bottom: 10px;
         }
+        .input > .sendBtn:hover{
+            background: #40d09a;
+        }
         /* 进入聊天室 */
         .enter{
             font-size: 14px;
@@ -68,6 +71,16 @@
         .leave > .user{
             color: #0a6cff;
         }
+        /* 消息 */
+        .selfContent, .otherContent{
+            margin-bottom: 10px;
+        }
+        .selfContent > .user, .selfContent > .time{
+            color: #8cd1ab;
+        }
+        .otherContent > .user, .otherContent > .time{
+            color: #1a7cfe;
+        }
     </style>
 </head>
 <body>
@@ -75,7 +88,7 @@
         <div class="title">聊天室</div>
         <div class="content"></div>
         <div class="input">
-            <textarea name="send" id="send"></textarea>
+            <textarea name="send" id="send" placeholder="说点什么吧..."></textarea>
             <div class="sendBtn">发送</div>
         </div>
     </div>
@@ -113,11 +126,28 @@
             });
             ws.close();
         };
+        // 发送消息
+        let send = document.getElementById('send');
+        document.getElementsByClassName('sendBtn')[0].onclick = () => {
+            if(!send.value){
+                send.setAttribute('placeholder', '先打字再发送...');
+                return;
+            }
+            // 发送消息
+            wsSendObject(ws, {
+                type: 2,
+                user: userName,
+                id: uuid,
+                msg: send.value
+            });
+            send.value = '';
+            send.setAttribute('placeholder', '说点什么吧...');
+        };
         /**
          * @description 添加消息
-         * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
+         * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-发言
         */
-        function addContent(type, {user, msg, id}){
+        function addContent(type, {user, msg, id, time}){
             let content = document.getElementsByClassName('content')[0];
             switch(type){
                 case 0:
@@ -127,13 +157,29 @@
                     enter.classList = 'enter';
                     enter.innerHTML = `<span class="user">${user}</span> 进入了聊天室`;
                     content.append(enter);
-                    break;
+                break;
                 case 1:
                     let leave = document.createElement('div');
                     leave.classList = 'leave';
                     leave.innerHTML = `<span class="user">${user}</span> 离开了聊天室`;
                     content.append(leave);
-                    break;
+                break;
+                case 2:
+                    // 自己发言
+                    if(id === uuid){
+                        let selfContent = document.createElement('div');
+                        selfContent.classList = 'selfContent';
+                        selfContent.innerHTML = `<span class="user">${user}</span> <span class="time">${time}</span><pre>${msg}</pre>`;
+                        content.append(selfContent);
+                    }
+                    // 其他人发言
+                    else{
+                        let otherContent = document.createElement('div');
+                        otherContent.classList = 'otherContent';
+                        otherContent.innerHTML = `<span class="user">${user}</span> <span class="time">${time}</span><pre>${msg}</pre>`;
+                        content.append(otherContent);
+                    }
+                break;
             }
         }
         // 使用 websocket 发送对象

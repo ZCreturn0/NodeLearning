@@ -22,27 +22,24 @@ ws.on('connection', (socket) => {
     socket.on('message', (message) => {
         let msg = JSON.parse(message);
         // console.log(msg);
-        // 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
+        // 消息类型: 0-进入聊天室  1-离开聊天室  2-发言
         switch(msg.type){
             case 0:
                 msg.id = id;
-                sockets.forEach(item => {
-                    socketSendObject(item.socket, msg);
-                });
-                break;
+                broadcast(sockets, msg);
+            break;
             case 1:
                 sockets.forEach((item, index) => {
                     if (item.id === msg.id) {
                         item.socket.close();
                         sockets.splice(index, 1);
-                        sockets.forEach(item => {
-                            socketSendObject(item.socket, {
-                                type: 1,
-                                user: msg.user
-                            });
+                        broadcast(sockets, {
+                            type: 1,
+                            user: msg.user
                         });
                     }
                 });
+            break;
         }
         // console.log(ws.);
         console.log(`当前有 ${sockets.length} 个用户在线`);
@@ -73,4 +70,11 @@ ws.on('close', () => {
 // 使用 socket 发送对象
 function socketSendObject(socket, obj) {
     socket.send(JSON.stringify(obj));
+}
+
+// 广播消息
+function broadcast(sockets, msg) {
+    sockets.forEach(item => {
+        socketSendObject(item.socket, msg);
+    });
 }

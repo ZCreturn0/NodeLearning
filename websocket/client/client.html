@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>聊天室</title>
     <style>
         *{
             margin: 0;
@@ -152,7 +152,10 @@
             switch(type){
                 case 0:
                     // 存储 uuid, 用于识别连接
-                    uuid = id;
+                    // 是自身的登录信息则更新 uuid
+                    if(!uuid && user === userName){
+                        uuid = id;
+                    }
                     let enter = document.createElement('div');
                     enter.classList = 'enter';
                     enter.innerHTML = `<span class="user">${user}</span> 进入了聊天室`;

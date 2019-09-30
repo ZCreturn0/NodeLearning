@@ -26,6 +26,7 @@ ws.on('connection', (socket) => {
         switch(msg.type){
             case 0:
                 msg.id = id;
+                // 广播消息
                 broadcast(sockets, msg);
             break;
             case 1:

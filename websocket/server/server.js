@@ -18,7 +18,6 @@ ws.on('connection', (socket) => {
         id: id,
         socket: socket
     });
-    // console.log("aaa---size:" + ws.clients.size);
     socket.on('message', (message) => {
         let msg = JSON.parse(message);
         // console.log(msg);

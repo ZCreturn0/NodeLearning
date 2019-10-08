@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>聊天室</title>
     <style>
         *{
             margin: 0;
@@ -49,6 +49,9 @@
             right: 10px;
             bottom: 10px;
         }
+        .input > .sendBtn:hover{
+            background: #40d09a;
+        }
         /* 进入聊天室 */
         .enter{
             font-size: 14px;
@@ -58,6 +61,26 @@
         .enter > .user{
             color: #0a6cff;
         }
+        /* 离开聊天室 */
+        .leave{
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            color: #ccc;
+        }
+        .leave > .user{
+            color: #0a6cff;
+        }
+        /* 消息 */
+        .selfContent, .otherContent{
+            margin-bottom: 10px;
+        }
+        .selfContent > .user, .selfContent > .time{
+            color: #8cd1ab;
+        }
+        .otherContent > .user, .otherContent > .time{
+            color: #1a7cfe;
+        }
     </style>
 </head>
 <body>
@@ -65,14 +88,16 @@
         <div class="title">聊天室</div>
         <div class="content"></div>
         <div class="input">
-            <textarea name="send" id="send"></textarea>
+            <textarea name="send" id="send" placeholder="说点什么吧..."></textarea>
             <div class="sendBtn">发送</div>
         </div>
     </div>
     <script>
-        const IP = '192.168.1.102';
+        const IP = '192.168.75.120';
         const PORT = 8888;
         let userName = '';
+        // 用户 id
+        let uuid = '';
         while(!userName){
             userName = prompt("请输入用户名:");
         }
@@ -93,23 +118,71 @@
         }
         // 页面卸载
         window.onbeforeunload = function(event) {
-            console.log(11111)
+            // 发送离开命令,关闭连接
+            wsSendObject(ws, {
+                type: 1,
+                id: uuid,
+                user: userName
+            });
             ws.close();
+        };
+        // 发送消息
+        let send = document.getElementById('send');
+        document.getElementsByClassName('sendBtn')[0].onclick = () => {
+            if(!send.value){
+                send.setAttribute('placeholder', '先打字再发送...');
+                return;
+            }
+            // 发送消息
+            wsSendObject(ws, {
+                type: 2,
+                user: userName,
+                id: uuid,
+                msg: send.value
+            });
+            send.value = '';
+            send.setAttribute('placeholder', '说点什么吧...');
         };
         /**
          * @description 添加消息
-         * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-其他人发言  3-自己发言
+         * @params type {Number} 消息类型: 0-进入聊天室  1-离开聊天室  2-发言
         */
-        function addContent(type, {user, msg}){
+        function addContent(type, {user, msg, id, time}){
             let content = document.getElementsByClassName('content')[0];
             switch(type){
                 case 0:
-                    console.log(user)
+                    // 存储 uuid, 用于识别连接
+                    // 是自身的登录信息则更新 uuid
+                    if(!uuid && user === userName){
+                        uuid = id;
+                    }
                     let enter = document.createElement('div');
                     enter.classList = 'enter';
                     enter.innerHTML = `<span class="user">${user}</span> 进入了聊天室`;
                     content.append(enter);
-                    break;
+                break;
+                case 1:
+                    let leave = document.createElement('div');
+                    leave.classList = 'leave';
+                    leave.innerHTML = `<span class="user">${user}</span> 离开了聊天室`;
+                    content.append(leave);
+                break;
+                case 2:
+                    // 自己发言
+                    if(id === uuid){
+                        let selfContent = document.createElement('div');
+                        selfContent.classList = 'selfContent';
+                        selfContent.innerHTML = `<span class="user">${user}</span> <span class="time">${time}</span><pre>${msg}</pre>`;
+                        content.append(selfContent);
+                    }
+                    // 其他人发言
+                    else{
+                        let otherContent = document.createElement('div');
+                        otherContent.classList = 'otherContent';
+                        otherContent.innerHTML = `<span class="user">${user}</span> <span class="time">${time}</span><pre>${msg}</pre>`;
+                        content.append(otherContent);
+                    }
+                break;
             }
         }
         // 使用 websocket 发送对象

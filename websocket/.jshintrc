@@ -7,8 +7,15 @@
         "clearTimeout": true,
         "alert": true,
         "Construct": true,
-        "Event": true
+        "Event": true,
+        "describe": false,
+        "it": false,
+        "before": false,
+        "beforeEach": false,
+        "after": false,
+        "afterEach": false
     },
+    "node": true,
     "asi": true,
     "curly": true,
     "esversion": 6,

@@ -12,6 +12,9 @@ const KEYWORDS = ['展示环节', '网上', '现象'];
 const CONTENT = '1'; //晚上好啊,小天使!!
 // 时间戳
 const TIMESTAMP = '0.9126456120812414';
+// cookie
+const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; loginrefer=pt_68df1a95417l; wan_auth37wan=ec18db34c7dfA453U6v4KNWSKeas6bEk%2BwsTeepK8Q%2BytSqF%2BFw57BfDSs%2BsPVJDYLZdG4lnPt83Lm49E24MnzaQK9fb1Ye8CSR%2BTPMO7VqBXgj8CEA; acf_yb_auth=a12c19061fcf3b5b2e2549fe28356d8680c523c3; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_t=jHnnMybPll0CQSMUkRjni6UajwdwSCl0; _dys_refer_action_code=click_yubatopic_yuba; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1570379167,1570444545,1570465135,1570533010; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1570533023; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1570464467,1570465202,1570465261,1570533501; _dys_lastPageCode=page_studio_normal,; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1570533535';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 // 定时器
 let timer = null;
 
@@ -31,9 +34,9 @@ function go(){
             console.log(err);
         }
         else{
-            console.log(res);
+            let json = JSON.parse(body);
             // 遍历帖子
-            for (let post of res.data) {
+            for (let post of json.data) {
                 if (post.nickname == USER && haveAllKeywords(post.title)) {
                     clearInterval(timer);
                     reply(post.post_id);
@@ -45,7 +48,29 @@ function go(){
 
 // 回帖
 function reply(post_id){
-    
+    request.post({
+        url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
+        form: {
+            repost: false,
+            content: `<p>${CONTENT}</p>`,
+            pid: post_id,
+            vo_id: '',
+            tokensign: ''
+        },
+        headers: {
+            'user-agent': USER_AGENT,
+            cookie: COOKIE,
+            origin: 'https://yuba.douyu.com',
+            referer: 'https://yuba.douyu.com/p/300738071570528907'
+        }
+    }, (err, res, body) => {
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log(body);
+        }
+    });
 }
 
 go();

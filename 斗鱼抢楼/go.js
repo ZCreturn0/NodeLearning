@@ -1,3 +1,10 @@
+/**
+ * 注意修改时间间隔!!!!!!!!!
+ * 注意修改评论内容!!!!!!!!!
+ * 注意修改关键字!!!!!!!!!!!
+ * 注意修改成最新cookie!!!!!
+ * 适当调整时间戳(暂时不知道什么用)
+ */
 const request = require('request');
 
 // 获取帖子列表URL
@@ -9,7 +16,7 @@ const USER = 'hanserLIVE';
 // 标题关键字
 const KEYWORDS = ['展示环节', '网上', '现象'];
 // 回帖内容
-const CONTENT = '1'; //晚上好啊,小天使!!
+const CONTENT = '2'; //晚上好啊,小天使!!
 // 时间戳
 const TIMESTAMP = '0.9126456120812414';
 // cookie
@@ -61,7 +68,7 @@ function reply(post_id){
             'user-agent': USER_AGENT,
             cookie: COOKIE,
             origin: 'https://yuba.douyu.com',
-            referer: 'https://yuba.douyu.com/p/300738071570528907'
+            referer: `https://yuba.douyu.com/p/${post_id}`
         }
     }, (err, res, body) => {
         if(err){

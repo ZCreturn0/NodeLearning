@@ -7,7 +7,23 @@ const INTERVAL = 10 * 1000;
 // 用户名
 const USER = 'hanserLIVE';
 // 标题关键字
-const keywords = ['展示环节', '网上', '现象'];
+const KEYWORDS = ['展示环节', '网上', '现象'];
+// 回帖内容
+const CONTENT = '1'; //晚上好啊,小天使!!
+// 时间戳
+const TIMESTAMP = '0.9126456120812414';
+// 定时器
+let timer = null;
+
+// 标题含有全部关键字
+function haveAllKeywords(title){
+    for (let keyword of KEYWORDS) {
+        if (!~title.indexOf(keyword)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 function go(){
     request(POST_LIST_URL, (err, res, body) => {
@@ -16,9 +32,21 @@ function go(){
         }
         else{
             console.log(res);
+            // 遍历帖子
+            for (let post of res.data) {
+                if (post.nickname == USER && haveAllKeywords(post.title)) {
+                    clearInterval(timer);
+                    reply(post.post_id);
+                }
+            }
         }
     });
 }
 
+// 回帖
+function reply(post_id){
+    
+}
+
 go();
-setInterval(go, INTERVAL);
+timer = setInterval(go, INTERVAL);

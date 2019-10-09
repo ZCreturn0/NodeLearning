@@ -16,7 +16,7 @@ const USER = 'hanserLIVE';
 // 标题关键字
 const KEYWORDS = ['展示环节', '网上', '现象'];
 // 回帖内容
-const CONTENT = '2'; //晚上好啊,小天使!!
+const CONTENT = '小天使~ 毛怪们 晚上好啊~';
 // 时间戳
 const TIMESTAMP = '0.9126456120812414';
 // cookie

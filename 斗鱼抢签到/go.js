@@ -9,7 +9,7 @@ const STATUS_ONLINE = '1';
 // 没开播
 const STATUS_OFFLINE = '2';
 // 轮巡间隔
-const INTERVAL = 10 * 1000;
+const INTERVAL = 0.1 * 1000;
 
 // 定时器
 let timer = null;
@@ -19,7 +19,7 @@ function checkOnline(){
     request(`${URL}${ROOM_ID}`, (err, res, body) => {
         if (err) {
             console.log(err);
-        } 
+        }
         else {
             let json = JSON.parse(body);
             if (json.data.room_status == STATUS_ONLINE) {

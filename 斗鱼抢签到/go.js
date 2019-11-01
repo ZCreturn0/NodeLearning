@@ -26,7 +26,7 @@ function checkOnline(){
     request(`${URL}${ROOM_ID}`, (err, res, body) => {
         if (err) {
             console.log(err);
-        } 
+        }
         else {
             let json = JSON.parse(body);
             if (json.data.room_status == STATUS_ONLINE) {

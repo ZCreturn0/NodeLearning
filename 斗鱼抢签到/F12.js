@@ -11,12 +11,16 @@ let progressObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
         let child = mutation.addedNodes[0];
         let user = child.getElementsByClassName('Barrage-nickName')[0].innerText;
-        let content = child.getElementsByClassName('Barrage-content')[0].innerText;
         console.log(user);
-        if (~user.indexOf(USER) && ~content.indexOf(CONTENT)) {
-            console.log('done');
-            let checkInBtn = document.getElementsByClassName('Autograph-tabBtn')[0];
-            checkInBtn.dispatchEvent(event);
+        let barrageContent = child.getElementsByClassName('Barrage-content');
+        if (barrageContent.length) {
+            let content = barrageContent[0].innerText;
+            console.log(content);
+            if (~user.indexOf(USER) && ~content.indexOf(CONTENT)) {
+                console.log('done');
+                let checkInBtn = document.getElementsByClassName('Autograph-tabBtn')[0];
+                checkInBtn.dispatchEvent(event);
+            }
         }
     });
 });

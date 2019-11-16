@@ -12,7 +12,7 @@
 const request = require('request');
 
 // 要抢的楼层
-const FLOOR = 10;
+const FLOOR = 6;
 
 // 获取帖子列表URL
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
@@ -21,11 +21,11 @@ const GET_REPLY_URL = 'https://yuba.douyu.com/wbapi/web/post/comments';
 // 刷新间隔
 const INTERVAL = 0.1 * 1000;
 // 用户名
-const USER = '妲己的小纯洁'; // hanserLIVE
+const USER = 'hanserLIVE'; // hanserLIVE
 // 标题关键字
 const KEYWORDS = ['吃桃'];
 // 回帖内容
-const CONTENT = '[开车]'; //小天使~ 毛怪们 晚上好呀~    [开车]     小天使~ 毛怪们 晚上好呀~[开车][开车]
+const CONTENT = '尝试抢下6楼 [开车]'; //小天使~ 毛怪们 晚上好呀~    [开车]     小天使~ 毛怪们 晚上好呀~[开车][开车]
 // 时间戳
 const TIMESTAMP = Math.random();
 // cookie
@@ -77,6 +77,7 @@ function checkReplies(post_id) {
         }
     }, (err, res, body) => {
         let json = JSON.parse(body);
+        console.log('回复数: ' + json.comments_total);
         if (json.comments_total >= FLOOR - 1) {
             if (!replied) {
                 replied = true;

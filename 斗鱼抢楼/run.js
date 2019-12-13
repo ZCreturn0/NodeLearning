@@ -3,7 +3,7 @@
  * 注意修改评论内容!!!!!!!!!
  * 注意修改关键字!!!!!!!!!!!
  * 注意修改成最新cookie!!!!!
- * 适当调整时间戳(暂时不知道什么用)
+ * 随机时间戳(暂时不知道什么用)
  */
 
  /**
@@ -16,7 +16,7 @@ const FLOOR = 5;
 
 // 获取帖子列表URL
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
-// 获取帖子回复URL
+// 获取帖子回复URL(格式为 URL/post_id )
 const GET_REPLY_URL = 'https://yuba.douyu.com/wbapi/web/post/comments';
 // 刷新间隔
 const INTERVAL = 0.1 * 1000;
@@ -50,7 +50,8 @@ function go() {
     request(POST_LIST_URL, (err, res, body) => {
         if (err) {
             console.log(err);
-        } else {
+        } 
+        else {
             let json = JSON.parse(body);
             // 遍历帖子
             for (let post of json.data) {

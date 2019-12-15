@@ -12,7 +12,7 @@ let params = {
     sdkappid: 1400029396,
     accounttype: 9967,
     apn: 1,
-    reqtime: 1576243261
+    reqtime: 1576245702
 };
 
 let headers = {
@@ -25,11 +25,7 @@ let headers = {
 
 let formData = {
     Timeout: 'null',
-    Cookie: {
-        "NotifySeq": 0,
-        "NoticeSeq": 14,
-        "LongPollingId": "1576242513823246695"
-    }
+    Cookie: '{"NotifySeq": 0,"NoticeSeq": 50,"LongPollingId": "1576242513823246695"}'
 };
 
 let url = '';
@@ -38,17 +34,16 @@ for (let [key, value] of Object.entries(params)) {
     query.push(`${key}=${value}`);
 }
 url = `${URL}?${query.join('&')}`;
-console.log(url);
 
-// request.post({
-//     url: URL,
-//     form: formData,
-//     headers
-// }, (err, res, body) => {
-//     if(err) {
-//         console.log(err);
-//     }
-//     else {
-//         console.log(booy);
-//     }
-// });
+request.post({
+    url,
+    form: formData,
+    headers
+}, (err, res, body) => {
+    if(err) {
+        console.log(err);
+    }
+    else {
+        console.log(body);
+    }
+});

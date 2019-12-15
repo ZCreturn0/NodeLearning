@@ -91,28 +91,28 @@ function checkReplies(post_id) {
 
 // 回帖
 function reply(post_id) {
-    request.post({
-        url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
-        form: {
-            repost: false,
-            content: `<p>${CONTENT}</p>`,
-            pid: post_id,
-            vo_id: '',
-            tokensign: ''
-        },
-        headers: {
-            'user-agent': USER_AGENT,
-            cookie: COOKIE,
-            origin: 'https://yuba.douyu.com',
-            referer: `https://yuba.douyu.com/p/${post_id}`
-        }
-    }, (err, res, body) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(body);
-        }
-    });
+    // request.post({
+    //     url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
+    //     form: {
+    //         repost: false,
+    //         content: `<p>${CONTENT}</p>`,
+    //         pid: post_id,
+    //         vo_id: '',
+    //         tokensign: ''
+    //     },
+    //     headers: {
+    //         'user-agent': USER_AGENT,
+    //         cookie: COOKIE,
+    //         origin: 'https://yuba.douyu.com',
+    //         referer: `https://yuba.douyu.com/p/${post_id}`
+    //     }
+    // }, (err, res, body) => {
+    //     if (err) {
+    //         console.log(err);
+    //     } else {
+    //         console.log(body);
+    //     }
+    // });
 }
 
 go();

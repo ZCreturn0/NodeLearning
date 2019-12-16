@@ -23,7 +23,7 @@ let totalReplies = 0;
 const INDEX = 6;
 let index = 1;
 // cookie
-const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; wan_auth37wan=6427ec1941feFUewUtGBkUxjYb7z%2FMT1yl%2Be6winkAh%2B52oXVOHuF9sT2RIr2YVvnqJK2GuAa0fC15VCB%2Bg%2Fx5pdWpDWSqN9QPI2DXAkNQfefSSw82U; acf_yb_did=64a637aa8d4b267801d704be00091501; acf_yb_auth=e93015aa2eb0bc9de8dd265c4e6f171d78c0bc56; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1576026949,1576112405,1576199575,1576458754; acf_yb_t=ycLNAIu7Oedi4ppr9UihpoQP2J4co9D3; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1576026967,1576112510,1576199586,1576458767; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1576458767; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1576464104';
+const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1576026949,1576112405,1576199575,1576458754; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1576026967,1576112510,1576199586,1576458767; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1576458767; acf_yb_auth=2493fc24741f4e6faa6549aa06e426adabd197fc; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_t=E2WjQdILbvLwrucb0kVR0Ke0Bb1fA3iy; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1576487077';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -59,6 +59,7 @@ function go() {
                     }
                 }
             }
+            console.log(`已氵 ${totalReplies} 帖.`);
         }
         if (index == INDEX) {
             index = 0;

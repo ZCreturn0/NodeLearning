@@ -12,7 +12,7 @@
 const request = require('request');
 
 // 要抢的楼层
-const FLOOR = 5;
+const FLOOR = 6;
 
 // 获取帖子列表URL
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
@@ -23,13 +23,13 @@ const INTERVAL = 0.1 * 1000;
 // 用户名
 const USER = 'hanserLIVE'; // hanserLIVE
 // 标题关键字
-const KEYWORDS = ['追认', '舔狗'];
+const KEYWORDS = process.argv.slice(2);
 // 回帖内容
-const CONTENT = '超管6楼留给我蟹蟹 [开车]'; //小天使~ 毛怪们 晚上好呀~    [开车]     小天使~ 毛怪们 晚上好呀~[开车][开车]
+const CONTENT = '[开车]'; //小天使~ 毛怪们 晚上好呀~    [开车]     小天使~ 毛怪们 晚上好呀~[开车][开车]
 // 时间戳
 const TIMESTAMP = Math.random();
 // cookie
-const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; _dys_refer_action_code=click_yubatopic_yuba; wan_auth37wan=5cd361317097t3dF4w7VxSW%2BZjt7pfHgDP000b48gZSuwjI1HUiUYNpUX%2FbhjB0r55q9v5vTUpyUhuy6sVsRdgXLpWvhCQwwJ%2B95c17qMuab%2FZNK8ZY; acf_yb_auth=bde3c373806d9c996fb511853711b7322099fcd8; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_t=ad6RgMxhtOI4YPIL2zHci5AOtq9RdMPs; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1573921411,1573924728,1573998039,1574075253; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1574078473; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1574078115,1574078177,1574078443,1574078477; _dys_lastPageCode=page_studio_normal,page_studio_normal; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1574081560';
+const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; wan_auth37wan=6427ec1941feFUewUtGBkUxjYb7z%2FMT1yl%2Be6winkAh%2B52oXVOHuF9sT2RIr2YVvnqJK2GuAa0fC15VCB%2Bg%2Fx5pdWpDWSqN9QPI2DXAkNQfefSSw82U; acf_yb_did=64a637aa8d4b267801d704be00091501; acf_yb_auth=e93015aa2eb0bc9de8dd265c4e6f171d78c0bc56; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1576026949,1576112405,1576199575,1576458754; acf_yb_t=ycLNAIu7Oedi4ppr9UihpoQP2J4co9D3; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1576026967,1576112510,1576199586,1576458767; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1576458767; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1576464104';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 // 定时器
 let timer = null;
@@ -91,28 +91,29 @@ function checkReplies(post_id) {
 
 // 回帖
 function reply(post_id) {
-    // request.post({
-    //     url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
-    //     form: {
-    //         repost: false,
-    //         content: `<p>${CONTENT}</p>`,
-    //         pid: post_id,
-    //         vo_id: '',
-    //         tokensign: ''
-    //     },
-    //     headers: {
-    //         'user-agent': USER_AGENT,
-    //         cookie: COOKIE,
-    //         origin: 'https://yuba.douyu.com',
-    //         referer: `https://yuba.douyu.com/p/${post_id}`
-    //     }
-    // }, (err, res, body) => {
-    //     if (err) {
-    //         console.log(err);
-    //     } else {
-    //         console.log(body);
-    //     }
-    // });
+    request.post({
+        url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
+        form: {
+            repost: false,
+            content: `<p>${CONTENT}</p>`,
+            pid: post_id,
+            vo_id: '',
+            tokensign: ''
+        },
+        headers: {
+            'user-agent': USER_AGENT,
+            cookie: COOKIE,
+            origin: 'https://yuba.douyu.com',
+            referer: `https://yuba.douyu.com/p/${post_id}`
+        }
+    }, (err, res, body) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(body);
+        }
+        process.exit(0);
+    });
 }
 
 go();

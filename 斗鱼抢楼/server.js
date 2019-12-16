@@ -45,7 +45,7 @@ http.createServer((req, res) => {
         req.on('end', () => {
             let params = JSON.parse(data);
             let keywords = params.keywords.join(' ');
-            exec(`node test.js ${keywords}`, (status) => {
+            exec(`node run.js ${keywords}`, (status) => {
                 console.log(status);
             });
         });

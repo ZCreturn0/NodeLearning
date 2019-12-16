@@ -9,7 +9,10 @@
         "Construct": true,
         "Event": true,
         "require": true,
-        "fetch": true
+        "fetch": true,
+        "setInterval": true,
+        "clearInterval": true,
+        "process": true
     },
     "asi": true,
     "curly": true,

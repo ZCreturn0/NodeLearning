@@ -19,6 +19,9 @@ http.createServer(function(req,res){
                 else if (suffixName == '.css') {
                     res.writeHead(200, { 'Content-Type': 'text/css' });
                 }
+                else if (suffixName == '.js') {
+                    res.writeHead(200, { 'Content-Type': 'application/x-javascript' });
+                }
                 else{
                     res.writeHead(200, { 'Content-Type': 'text/plain' });
                 }

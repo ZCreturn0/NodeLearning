@@ -13,7 +13,7 @@ const INTERVAL = 5 * 1000;
 // 时间戳
 const TIMESTAMP = Math.random();
 // 回帖内容
-const CONTENT = '[发呆]';
+let CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
 // 关键字不回复
 const BAN_WORDS = ['即删', '自删', '水贴', '氵贴', '氵'];
@@ -141,6 +141,28 @@ function replied(data) {
     }
     return false;
 }
+
+// 根据时间生成回复内容
+function makeMeeting() {
+    let hour = new Date().getHours();
+    if (hour >= 9 && hour < 22) {
+        CONTENT = '[发呆]';
+    }
+    else if (hour >= 22) {
+        CONTENT = '[发呆] 晚上好';
+    }
+    else if (hour >= 0 && hour < 1) {
+        CONTENT = '[发呆] 晚上好~ 氵氵睡了';
+    }
+    else if (hour >= 1 && hour < 3) {
+        CONTENT = '[发呆] 修仙的吗';
+    }
+    else if (hour >= 3 && hour < 6) {
+        CONTENT = '[发呆] 疯狂修仙';
+    }
+}
+makeMeeting();
+setInterval(makeMeeting, 10 * 60 * 1000);
 
 function sleep(ms) {
     return new Promise((resolve) => {

@@ -16,14 +16,14 @@ const TIMESTAMP = Math.random();
 const CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
 // 关键字不回复
-const BAN_WORDS = ['即删', '自删', '水贴', '氵贴'];
+const BAN_WORDS = ['即删', '自删', '水贴', '氵贴', '氵'];
 // 回帖数
 let totalReplies = 0;
 // 轮巡达到次数才回帖
 const INDEX = 6;
 let index = 1;
 // cookie
-const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1576026949,1576112405,1576199575,1576458754; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1576026967,1576112510,1576199586,1576458767; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1576458767; acf_yb_auth=2493fc24741f4e6faa6549aa06e426adabd197fc; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_t=E2WjQdILbvLwrucb0kVR0Ke0Bb1fA3iy; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1576487077';
+const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1576026949,1576112405,1576199575,1576458754; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1576026967,1576112510,1576199586,1576458767; acf_yb_auth=2493fc24741f4e6faa6549aa06e426adabd197fc; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; wan_auth37wan=b8f44189e895pXA0%2Bc7Qf%2Fn8TvuDWhNLm%2FJTmBYUH3h4St8FxnFNYNDoTofs5heuiT01AvLIhtTwrYUD6VHuZW%2FCE3xkPHW9c%2Bm4OUyQvG1GIGaHe%2FU; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1576549330; acf_yb_t=3SpgXO9q6UEqjoTuiksxMLoa65R7jXxY; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1576562280';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -101,7 +101,7 @@ function reply(post_id, content) {
         url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
         form: {
             repost: false,
-            content: `<p>${CONTENT}</p>`,
+            content: `<p>${content}</p>`,
             pid: post_id,
             vo_id: '',
             tokensign: ''

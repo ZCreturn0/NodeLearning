@@ -148,17 +148,17 @@ function makeMeeting() {
     if (hour >= 9 && hour < 22) {
         CONTENT = '[发呆]';
     }
-    else if (hour >= 22) {
-        CONTENT = '[发呆] 晚上好';
+    else if (hour >= 22 || hour < 1) {
+        CONTENT = '[发呆]';
     }
-    else if (hour >= 0 && hour < 1) {
-        CONTENT = '[发呆] 晚上好~ 氵氵睡了';
+    else if (hour >= 1 && hour < 2) {
+        CONTENT = '[发呆] 早点睡呀 [开车]';
     }
-    else if (hour >= 1 && hour < 3) {
-        CONTENT = '[发呆] 修仙的吗';
+    else if (hour >= 2 && hour < 3) {
+        CONTENT = '[发呆] 少修仙呀~';
     }
     else if (hour >= 3 && hour < 6) {
-        CONTENT = '[发呆] 疯狂修仙';
+        CONTENT = '[发呆] 哇,疯狂修仙的吗,睡了睡了';
     }
 }
 makeMeeting();

@@ -10,7 +10,13 @@ let MutationObserver = window.MutationObserver || window.WebKitMutationObserver 
 let progressObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
         let child = mutation.addedNodes[0];
-        let user = child.getElementsByClassName('Barrage-nickName')[0].innerText;
+        let user;
+        if (child.getElementsByClassName('Barrage-nickName')[0]) {
+            user = child.getElementsByClassName('Barrage-nickName')[0].innerText;
+        }
+        else {
+            continue;
+        }
         console.log(user);
         let barrageContent = child.getElementsByClassName('Barrage-content');
         if (barrageContent.length) {

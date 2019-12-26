@@ -7,6 +7,10 @@ const fs = require('fs');
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
 // 获取帖子回复URL(格式为 URL/post_id )
 const GET_REPLY_URL = 'https://yuba.douyu.com/wbapi/web/post/comments';
+// 点赞URL
+const LIKE = 'https://yuba.douyu.com/ybapi/follow/like';
+// 查询是否点赞
+const IS_LIKED = 'https://yuba.douyu.com/wbapi/web/post/detail';
 // 前几楼回复
 const FLOOR = 5;
 // 刷新间隔
@@ -20,6 +24,8 @@ const ME = '疯狂吸憨';
 const BAN_WORDS = ['即删', '自删', '水贴', '氵贴', '氵', '冫']; //, '水'
 // 复读机
 const REPEAT = ['早上好', '中午好', '晚上好', '早安', '午安', '晚安'];
+// 强
+const GOOD = ['礼物'];
 // 回帖数
 let totalReplies = 0;
 // 轮巡达到次数才回帖
@@ -35,8 +41,7 @@ function go() {
         console.log('***********************');
         if (err) {
             console.log(err);
-        }
-        else {
+        } else {
             let json = JSON.parse(body);
             // 去除置顶 3 条,取前 5 条
             let data = json.data.slice(3, 8);
@@ -50,9 +55,9 @@ function go() {
                 if (post.nickname == 'hanserLIVE') {
                     continue;
                     // checkReplies(post.post_id, '天使球~ 捕捉', {
-                        //     author: post.nickname,
-                        //     title: post.title
-                        // });
+                    //     author: post.nickname,
+                    //     title: post.title
+                    // });
                 }
                 else if (post.nickname == '憨捡回家的痒痒泰迪') {
                     checkReplies(post.post_id, '你又在氵贴??', {
@@ -81,6 +86,12 @@ function go() {
                                 title: post.title
                             });
                         }
+                        else if (good(post.title)) {
+                            checkReplies(post.post_id, good(post.title), {
+                                author: post.nickname,
+                                title: post.title
+                            });
+                        }
                         else {
                             checkReplies(post.post_id, CONTENT, {
                                 author: post.nickname,
@@ -88,6 +99,9 @@ function go() {
                             });
                         }
                     }
+                }
+                if (!isLiked(post.post_id)) {
+                    like(post.post_id);
                 }
             }
             console.log(`已氵 ${totalReplies} 帖.`);
@@ -114,12 +128,10 @@ function checkReplies(post_id, content, info) {
         // 前几楼已经没了
         if (json.comments_total > FLOOR - 1) {
             return;
-        }
-        else {
+        } else {
             if (replied(json.data)) {
                 return;
-            }
-            else {
+            } else {
                 reply(post_id, content, info);
             }
         }
@@ -149,9 +161,45 @@ function reply(post_id, content, info) {
         } else {
             console.log(body);
             console.log(`已氵 ${++totalReplies} 帖.`);
-            log(`标题: ${info.title}`, `作者: ${info.author}`, `回复: ${content}`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
+            log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `回复: ${content}`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
         }
     });
+}
+
+// 点赞
+function like(post_id, info) {
+    request.post({
+        url: `${LIKE}?timestamp=${TIMESTAMP}`,
+        form: {
+            pid: post_id,
+            type: 1
+        },
+        headers: {
+            'user-agent': USER_AGENT,
+            cookie: COOKIE,
+            origin: 'https://yuba.douyu.com',
+            referer: `https://yuba.douyu.com/p/${post_id}`
+        }
+    }, (err, res, body) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(body);
+            console.log(`已氵 ${++totalReplies} 帖.`);
+            log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `已点赞`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
+        }
+    });
+}
+
+// 是否已经点过赞
+async function isLiked(post_id) {
+    request({
+        url: `${IS_LIKED}/${post_id}?cid=&timestamp=${Math.random()}`,
+        method: 'GET'
+    }, (err, res, body) => {
+        let json = JSON.parse(body);
+        return json.data.is_liked;
+    })
 }
 
 // 水贴不回
@@ -174,6 +222,16 @@ function repeat(title) {
     return false;
 }
 
+// 强
+function good(title) {
+    for (let item of GOOD) {
+        if (~title.indexOf(item)) {
+            return `[强]`;
+        }
+    }
+    return false;
+}
+
 // 是否已经回过了
 function replied(data) {
     for (let item of data) {
@@ -189,17 +247,13 @@ function makeMeeting() {
     let hour = new Date().getHours();
     if (hour >= 9 && hour < 22) {
         CONTENT = '[发呆]';
-    }
-    else if (hour >= 22 || hour < 1) {
+    } else if (hour >= 22 || hour < 1) {
         CONTENT = '[发呆]';
-    }
-    else if (hour >= 1 && hour < 2) {
+    } else if (hour >= 1 && hour < 2) {
         CONTENT = '[发呆] 早点睡呀 [开车]';
-    }
-    else if (hour >= 2 && hour < 3) {
+    } else if (hour >= 2 && hour < 3) {
         CONTENT = '[发呆] 少修仙呀~';
-    }
-    else if (hour >= 3 && hour < 6) {
+    } else if (hour >= 3 && hour < 6) {
         CONTENT = '[发呆] 哇,疯狂修仙的吗,睡了睡了';
     }
 }
@@ -228,7 +282,7 @@ function dateFormat(fmt, date) {
 function log(...msg) {
     let str = msg.join('\r\n');
     str = '--------------------------------------------------------------\r\n' + str + '\r\n--------------------------------------------------------------\r\n\r\n\r\n\r\n';
-    let today = dateFormat('YYYY-mm-dd');
+    let today = dateFormat('YYYY-mm-dd', new Date());
     fs.appendFile(`./log/${today}.txt`, str, 'utf-8', err => {
         if (err) {
             console.log(err);

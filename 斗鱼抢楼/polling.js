@@ -16,14 +16,16 @@ const TIMESTAMP = Math.random();
 let CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
 // 关键字不回复
-const BAN_WORDS = ['即删', '自删', '水贴', '氵贴', '氵'];
+const BAN_WORDS = ['即删', '自删', '水贴', '氵贴', '氵', '冫']; //, '水'
+// 复读机
+const REPEAT = ['早上好', '中午好', '晚上好', '早安', '午安', '晚安'];
 // 回帖数
 let totalReplies = 0;
 // 轮巡达到次数才回帖
 const INDEX = 6;
 let index = 1;
 // cookie
-const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1576026949,1576112405,1576199575,1576458754; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1576026967,1576112510,1576199586,1576458767; acf_yb_auth=2493fc24741f4e6faa6549aa06e426adabd197fc; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; wan_auth37wan=b8f44189e895pXA0%2Bc7Qf%2Fn8TvuDWhNLm%2FJTmBYUH3h4St8FxnFNYNDoTofs5heuiT01AvLIhtTwrYUD6VHuZW%2FCE3xkPHW9c%2Bm4OUyQvG1GIGaHe%2FU; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1576549330; acf_yb_t=3SpgXO9q6UEqjoTuiksxMLoa65R7jXxY; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1576562280';
+const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; acf_yb_auth=f24850300a476ca6bc58c23dd9cb94399561e060; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=d2753cfF6JGQIprMJSMAP4VikU1sOGYwiBJCLCRJ91glWzvYPbGlSuK%2FPhtPRO9D9fLBWXj0lLQVAaAPJ8HK8KhkKYZYRwxLc%2FlLhzwfPig6n1rtnDGiQu8; wan_auth37wan=514a47b5ddfbxnb2iO2YBp%2BU9kDOr3ptLeVfVHYRFxhSwfXN5jN%2Fdx%2Bnl4fqaCAMB9McxgUb9VxojFs5Hx1iojNut5U7xhIYI%2BQgYmBdd%2BshHj7%2Fu%2FM; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1577065219,1577151130,1577237639,1577322086; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1577065226,1577151137,1577237692,1577322093; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1577322093; acf_yb_t=Pwqh8PaPKqB5FbkIeEq66rhXrXhyJ61D; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1577328810';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -45,17 +47,27 @@ function go() {
                 console.log('回复数:', post.comments);
                 console.log('-------------------------');
                 if (post.nickname == 'hanserLIVE') {
-                    checkReplies(post.post_id, '哇~ 小天使..');
+                    continue;
+                    // checkReplies(post.post_id, '天使球~ 捕捉');
                 }
                 else if (post.nickname == '憨捡回家的痒痒泰迪') {
                     checkReplies(post.post_id, '你又在氵贴??');
                 }
+                else if (post.nickname == '我会画本子135208') {
+                    checkReplies(post.post_id, '冲冲冲~ [开车][开车]');
+                }
                 else if (banned(post.title)) {
-                    continue;
+                    // continue;
+                    checkReplies(post.post_id, '一起氵一起氵[开车][开车]');
                 }
                 else {
                     if (index == INDEX) {
-                        checkReplies(post.post_id, CONTENT);
+                        if (repeat(post.title)) {
+                            checkReplies(post.post_id, repeat(post.title));
+                        }
+                        else {
+                            checkReplies(post.post_id, CONTENT);
+                        }
                     }
                 }
             }
@@ -132,6 +144,16 @@ function banned(title) {
     return false;
 }
 
+// 启动复读机
+function repeat(title) {
+    for (let item of REPEAT) {
+        if (~title.indexOf(item)) {
+            return `${item} [开车]`;
+        }
+    }
+    return false;
+}
+
 // 是否已经回过了
 function replied(data) {
     for (let item of data) {
@@ -161,8 +183,29 @@ function makeMeeting() {
         CONTENT = '[发呆] 哇,疯狂修仙的吗,睡了睡了';
     }
 }
-makeMeeting();
-setInterval(makeMeeting, 10 * 60 * 1000);
+
+// 时间格式化
+function dateFormat(fmt, date) {
+    let ret;
+    let opt = {
+        "Y+": date.getFullYear().toString(), // 年
+        "m+": (date.getMonth() + 1).toString(), // 月
+        "d+": date.getDate().toString(), // 日
+        "H+": date.getHours().toString(), // 时
+        "M+": date.getMinutes().toString(), // 分
+        "S+": date.getSeconds().toString() // 秒
+        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+    };
+    for (let k in opt) {
+        ret = new RegExp("(" + k + ")").exec(fmt);
+        if (ret) {
+            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+        };
+    };
+    return fmt;
+}
+// makeMeeting();
+// setInterval(makeMeeting, 10 * 60 * 1000);
 
 function sleep(ms) {
     return new Promise((resolve) => {

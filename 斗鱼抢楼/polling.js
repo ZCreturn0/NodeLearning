@@ -3,6 +3,7 @@
  */
 
 const request = require('request');
+const fs = require('fs');
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
 // 获取帖子回复URL(格式为 URL/post_id )
 const GET_REPLY_URL = 'https://yuba.douyu.com/wbapi/web/post/comments';
@@ -48,25 +49,43 @@ function go() {
                 console.log('-------------------------');
                 if (post.nickname == 'hanserLIVE') {
                     continue;
-                    // checkReplies(post.post_id, '天使球~ 捕捉');
+                    // checkReplies(post.post_id, '天使球~ 捕捉', {
+                        //     author: post.nickname,
+                        //     title: post.title
+                        // });
                 }
                 else if (post.nickname == '憨捡回家的痒痒泰迪') {
-                    checkReplies(post.post_id, '你又在氵贴??');
+                    checkReplies(post.post_id, '你又在氵贴??', {
+                        author: post.nickname,
+                        title: post.title
+                    });
                 }
                 else if (post.nickname == '我会画本子135208') {
-                    checkReplies(post.post_id, '冲冲冲~ [开车][开车]');
+                    checkReplies(post.post_id, '冲冲冲~ [开车][开车]', {
+                        author: post.nickname,
+                        title: post.title
+                    });
                 }
                 else if (banned(post.title)) {
                     // continue;
-                    checkReplies(post.post_id, '一起氵一起氵[开车][开车]');
+                    checkReplies(post.post_id, '一起氵一起氵[开车][开车]', {
+                        author: post.nickname,
+                        title: post.title
+                    });
                 }
                 else {
                     if (index == INDEX) {
                         if (repeat(post.title)) {
-                            checkReplies(post.post_id, repeat(post.title));
+                            checkReplies(post.post_id, repeat(post.title), {
+                                author: post.nickname,
+                                title: post.title
+                            });
                         }
                         else {
-                            checkReplies(post.post_id, CONTENT);
+                            checkReplies(post.post_id, CONTENT, {
+                                author: post.nickname,
+                                title: post.title
+                            });
                         }
                     }
                 }
@@ -81,7 +100,7 @@ function go() {
 }
 
 // 查看帖子回复
-function checkReplies(post_id, content) {
+function checkReplies(post_id, content, info) {
     request({
         url: `${GET_REPLY_URL}/${post_id}`,
         method: 'GET',
@@ -101,14 +120,14 @@ function checkReplies(post_id, content) {
                 return;
             }
             else {
-                reply(post_id, content);
+                reply(post_id, content, info);
             }
         }
     })
 }
 
 // 回帖
-function reply(post_id, content) {
+function reply(post_id, content, info) {
     request.post({
         url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
         form: {
@@ -130,6 +149,7 @@ function reply(post_id, content) {
         } else {
             console.log(body);
             console.log(`已氵 ${++totalReplies} 帖.`);
+            log(`标题: ${info.title}`, `作者: ${info.author}`, `回复: ${content}`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
         }
     });
 }
@@ -188,13 +208,12 @@ function makeMeeting() {
 function dateFormat(fmt, date) {
     let ret;
     let opt = {
-        "Y+": date.getFullYear().toString(), // 年
-        "m+": (date.getMonth() + 1).toString(), // 月
-        "d+": date.getDate().toString(), // 日
-        "H+": date.getHours().toString(), // 时
-        "M+": date.getMinutes().toString(), // 分
-        "S+": date.getSeconds().toString() // 秒
-        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+        "Y+": date.getFullYear().toString(),
+        "m+": (date.getMonth() + 1).toString(),
+        "d+": date.getDate().toString(),
+        "H+": date.getHours().toString(),
+        "M+": date.getMinutes().toString(),
+        "S+": date.getSeconds().toString()
     };
     for (let k in opt) {
         ret = new RegExp("(" + k + ")").exec(fmt);
@@ -203,6 +222,20 @@ function dateFormat(fmt, date) {
         };
     };
     return fmt;
+}
+
+// 打印日志
+function log(...msg) {
+    let str = msg.join('\r\n');
+    str = '--------------------------------------------------------------\r\n' + str + '\r\n--------------------------------------------------------------\r\n\r\n\r\n\r\n';
+    let today = dateFormat('YYYY-mm-dd');
+    fs.appendFile(`./log/${today}.txt`, str, 'utf-8', err => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('done');
+        }
+    });
 }
 // makeMeeting();
 // setInterval(makeMeeting, 10 * 60 * 1000);

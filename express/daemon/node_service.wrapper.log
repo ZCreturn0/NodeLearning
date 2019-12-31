@@ -1,0 +1,22 @@
+2019-12-20 10:47:49 - Starting C:\Program Files\nodejs\node.exe  --harmony D:\前端\Node\express\node_modules\node-windows\lib\wrapper.js --file D:\前端\Node\express\server.js --log "node_service wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2019-12-20 10:47:49 - Started 9128
+2019-12-20 10:49:17 - Stopping node_service.exe
+2019-12-20 10:49:17 - ProcessKill 9128
+2019-12-20 10:49:18 - Shutdown exception
+Message:未能加载文件或程序集“System.Management, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a”或它的某一个依赖项。介质受写入保护。 (异常来自 HRESULT:0x80070013)
+Stacktrace:   at winsw.WrapperService.GetChildPids(Int32 pid)
+   at winsw.WrapperService.StopProcessAndChildren(Int32 pid)
+   at winsw.WrapperService.StopIt()
+   at winsw.WrapperService.OnShutdown()
+2019-12-20 10:50:06 - Starting C:\Program Files\nodejs\node.exe  --harmony D:\前端\Node\express\node_modules\node-windows\lib\wrapper.js --file D:\前端\Node\express\server.js --log "node_service wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2019-12-20 10:50:06 - Started 1796
+2019-12-20 10:59:02 - Stopping node_service.exe
+2019-12-20 10:59:02 - ProcessKill 1796
+2019-12-20 10:59:03 - Found child process: 2056 Name: node.exe
+2019-12-20 10:59:03 - Stopping process 2056
+2019-12-20 10:59:03 - Send SIGINT 2056
+2019-12-20 10:59:03 - SIGINT to 2056 failed - Killing as fallback
+2019-12-20 10:59:03 - Stopping process 1796
+2019-12-20 10:59:03 - Send SIGINT 1796
+2019-12-20 10:59:03 - SIGINT to1796 successful
+2019-12-20 10:59:03 - Finished node_service.exe

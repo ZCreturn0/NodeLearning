@@ -16,7 +16,7 @@ app.receiver.on('message', (meta) => {
     console.log(meta.groupId);
     console.log(meta.rawMessage);
     console.log(meta.sender.userId);
-    if (meta.sender.userId == '794698991' && ~meta.rawMessage.indexOf('开播')) {
+    if (meta.sender.userId == '794698991' && ~meta.rawMessage.indexOf('开播')) { // 794698991
         robot.mouseClick();
         console.log('done');
     }

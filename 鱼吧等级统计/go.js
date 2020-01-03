@@ -37,10 +37,11 @@ const TOTAL_PAGE = 1104;
 const POSTS_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist';
 const GROUP_ID = 765880;
 
-async function go() {
+function go() {
     for (let i = START; i <= END; i++) {
-        console.log(i);
-        await getPagePost(i);
+        setTimeout(() => {
+            getPagePost(i);
+        }, 100);
     }
 }
 

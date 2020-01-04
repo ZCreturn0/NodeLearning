@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        .rank {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 10px;
+            list-style: none;
+        }
+        .rank li {
+            margin: 20px 0;
+            padding: 10px 20px;
+            line-height: 30px;
+            position: relative;
+        }
+        .rank li:nth-child(1) {
+            background: #FFFBEB;
+        }
+        .rank li:nth-child(2) {
+            background: #F7F8F8;
+        }
+        .rank li:nth-child(3) {
+            background: #FFF8F0;
+        }
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        .floor {
+            position: absolute;
+            right: 20px;
+            bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <ul class="rank">
+
+    </ul>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        $.get('http://129.204.113.40:2550/getRandom', res => {
+            console.log(res);
+            let ul = $(".rank");
+            let index = 1;
+            for (let commet of res) {
+                ul.append(`<li>${index++}.&nbsp;&nbsp;<img class="avatar"
+                        src='${commet.avatar}' />&nbsp;&nbsp;${commet.name}
+                        <div class='floor'>${commet.floor}L</div>
+                </li>`);
+            }
+        });
+    </script>
+</body>
+</html>

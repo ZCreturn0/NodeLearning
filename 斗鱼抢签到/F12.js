@@ -13,19 +13,16 @@ let progressObserver = new MutationObserver(function (mutations) {
         let user;
         if (child.getElementsByClassName('Barrage-nickName')[0]) {
             user = child.getElementsByClassName('Barrage-nickName')[0].innerText;
-        }
-        else {
-            continue;
-        }
-        console.log(user);
-        let barrageContent = child.getElementsByClassName('Barrage-content');
-        if (barrageContent.length) {
-            let content = barrageContent[0].innerText;
-            console.log(content);
-            if (~user.indexOf(USER) && ~content.indexOf(CONTENT)) {
-                console.log('done');
-                let checkInBtn = document.getElementsByClassName('Autograph-tabBtn')[0];
-                checkInBtn.dispatchEvent(event);
+            console.log(user);
+            let barrageContent = child.getElementsByClassName('Barrage-content');
+            if (barrageContent.length) {
+                let content = barrageContent[0].innerText;
+                console.log(content);
+                if (~user.indexOf(USER) && ~content.indexOf(CONTENT)) {
+                    console.log('done');
+                    let checkInBtn = document.getElementsByClassName('Autograph-tabBtn')[0];
+                    checkInBtn.dispatchEvent(event);
+                }
             }
         }
     });

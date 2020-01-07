@@ -15,33 +15,46 @@ const IS_LIKED = 'https://yuba.douyu.com/wbapi/web/post/detail';
 const FLOOR = 5;
 // 刷新间隔
 const INTERVAL = 5 * 1000;
-// 时间戳
-const TIMESTAMP = Math.random();
 // 回帖内容
 let CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
 // 关键字不回复
-const BAN_WORDS = ['即删', '自删', '水贴', '氵贴', '氵', '冫']; //, '水'
+const BAN_WORDS = ['即删', '自删', '水贴', '水', '氵贴', '氵', '冫'];
 // 复读机
 const REPEAT = ['早上好', '中午好', '晚上好', '早安', '午安', '晚安'];
 // 强
-const GOOD = ['礼物'];
+const GOOD = ['礼物', '系列'];
+// 加油
+const CHEER_UP = ['考试', '挑战', '复习', '加油'];
+// 歌单
+const SONGS = ['歌单', '网易', '总结', '年度', '来了', '跟风', '毛怪', '假粉'];
+// 生日
+const BIRTHDAY = ['生日', '长大一岁', '老了一岁'];
+// 呜呜呜
+const WUWUWU = ['呜呜呜', '1551'];
+// 开车
+const DRIVER = ['图', '喵', 'Hanser', 'hanser', '好日子', '新人', '憨八嘎', '哈哈', '好棒', '画', '唱', '天使'];
+// 新年好
+// const NEWYEAR2 = ['新年好', '新年快乐', '新的一年'];
 // 回帖数
 let totalReplies = 0;
+// 点赞数
+let myLikes = 0;
 // 轮巡达到次数才回帖
 const INDEX = 6;
 let index = 1;
 // cookie
-const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; acf_yb_auth=f24850300a476ca6bc58c23dd9cb94399561e060; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=d2753cfF6JGQIprMJSMAP4VikU1sOGYwiBJCLCRJ91glWzvYPbGlSuK%2FPhtPRO9D9fLBWXj0lLQVAaAPJ8HK8KhkKYZYRwxLc%2FlLhzwfPig6n1rtnDGiQu8; wan_auth37wan=514a47b5ddfbxnb2iO2YBp%2BU9kDOr3ptLeVfVHYRFxhSwfXN5jN%2Fdx%2Bnl4fqaCAMB9McxgUb9VxojFs5Hx1iojNut5U7xhIYI%2BQgYmBdd%2BshHj7%2Fu%2FM; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1577065219,1577151130,1577237639,1577322086; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1577065226,1577151137,1577237692,1577322093; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1577322093; acf_yb_t=Pwqh8PaPKqB5FbkIeEq66rhXrXhyJ61D; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1577328810';
+const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_auth=44122fe7fcb9faa9b61614a46ab4782c1e56288c; dy_auth=d231fJ2vAZrkFOozrcBL8wydk8roBmxG2LVYK355V6f6j%2FejTQvwZj1mByo6YhuvVDK4GoTJQ2L8zTSiZ4WsOkoTkRLV8cGMXjPamHHwpkM%2FK1ZVAglcNRs; wan_auth37wan=7faa9f8296e1YexN33QzRB4GZMbSgQBIxN9PTs9JqNJNUdY3wc1Lvh5ayM6ZfJOhHcHAYTzIOoTRrTbY9g3hAnDrH1u1%2BQD8wCjrVNnG0URfeQFK2zI; acf_yb_t=TPe5DPDSBN4U05zDLSvAJ9tNfHz97Ys7; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578200547,1578228787,1578230438,1578308905; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578308925; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578236057,1578237961,1578308943,1578308983; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578308983';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
     // 获取帖子列表
-    request(POST_LIST_URL, (err, res, body) => {
+    request(POST_LIST_URL, async (err, res, body) => {
         console.log('***********************');
         if (err) {
             console.log(err);
-        } else {
+        }
+        else {
             let json = JSON.parse(body);
             // 去除置顶 3 条,取前 5 条
             let data = json.data.slice(3, 8);
@@ -52,59 +65,17 @@ function go() {
                 console.log('标题', post.title);
                 console.log('回复数:', post.comments);
                 console.log('-------------------------');
-                if (post.nickname == 'hanserLIVE') {
-                    continue;
-                    // checkReplies(post.post_id, '天使球~ 捕捉', {
-                    //     author: post.nickname,
-                    //     title: post.title
-                    // });
-                }
-                else if (post.nickname == '憨捡回家的痒痒泰迪') {
-                    checkReplies(post.post_id, '你又在氵贴??', {
+                // 回复
+                // sendReply(post);
+                if (!(await isLiked(post.post_id))) {
+                    like(post.post_id, {
                         author: post.nickname,
                         title: post.title
                     });
-                }
-                else if (post.nickname == '我会画本子135208') {
-                    checkReplies(post.post_id, '冲冲冲~ [开车][开车]', {
-                        author: post.nickname,
-                        title: post.title
-                    });
-                }
-                else if (banned(post.title)) {
-                    // continue;
-                    checkReplies(post.post_id, '一起氵一起氵[开车][开车]', {
-                        author: post.nickname,
-                        title: post.title
-                    });
-                }
-                else {
-                    if (index == INDEX) {
-                        if (repeat(post.title)) {
-                            checkReplies(post.post_id, repeat(post.title), {
-                                author: post.nickname,
-                                title: post.title
-                            });
-                        }
-                        else if (good(post.title)) {
-                            checkReplies(post.post_id, good(post.title), {
-                                author: post.nickname,
-                                title: post.title
-                            });
-                        }
-                        else {
-                            checkReplies(post.post_id, CONTENT, {
-                                author: post.nickname,
-                                title: post.title
-                            });
-                        }
-                    }
-                }
-                if (!isLiked(post.post_id)) {
-                    like(post.post_id);
                 }
             }
             console.log(`已氵 ${totalReplies} 帖.`);
+            console.log(`已点赞 ${myLikes} 帖.`);
         }
         if (index == INDEX) {
             index = 0;
@@ -141,7 +112,7 @@ function checkReplies(post_id, content, info) {
 // 回帖
 function reply(post_id, content, info) {
     request.post({
-        url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${TIMESTAMP}`,
+        url: `https://yuba.douyu.com/ybapi/answer/comment?timestamp=${Math.random()}`,
         form: {
             repost: false,
             content: `<p>${content}</p>`,
@@ -166,10 +137,66 @@ function reply(post_id, content, info) {
     });
 }
 
+// 根据内容回复
+function sendReply(post) {
+    // if (post.nickname == 'hanserLIVE') {
+    //     checkReplies(post.post_id, '[开车][开车][开车]', {
+    //         author: post.nickname,
+    //         title: post.title
+    //     });
+    // }
+    // else if (post.nickname == '憨捡回家的痒痒泰迪') {
+    //     checkReplies(post.post_id, '你又在冫贴??', {
+    //         author: post.nickname,
+    //         title: post.title
+    //     });
+    // }
+    if (post.nickname == '我会画本子135208') {
+        checkReplies(post.post_id, '冲冲冲~ [开车][开车]', {
+            author: post.nickname,
+            title: post.title
+        });
+    }
+    else if (banned(post.title)) {
+        checkReplies(post.post_id, '一起冫一起冫[开车][开车]', {
+            author: post.nickname,
+            title: post.title
+        });
+    }
+    else {
+        if (index == INDEX) {
+            if (repeat(post.title)) {
+                checkReplies(post.post_id, repeat(post.title), {
+                    author: post.nickname,
+                    title: post.title
+                });
+            }
+            else if (good(post.title)) {
+                checkReplies(post.post_id, good(post.title), {
+                    author: post.nickname,
+                    title: post.title
+                });
+            }
+            else if (customizedReplies(post.title)) {
+                checkReplies(post.post_id, customizedReplies(post.title), {
+                    author: post.nickname,
+                    title: post.title
+                });
+            }
+            else {
+                checkReplies(post.post_id, CONTENT, {
+                    author: post.nickname,
+                    title: post.title
+                });
+            }
+        }
+    }
+}
+
 // 点赞
 function like(post_id, info) {
     request.post({
-        url: `${LIKE}?timestamp=${TIMESTAMP}`,
+        url: `${LIKE}?timestamp=${Math.random()}`,
         form: {
             pid: post_id,
             type: 1
@@ -184,22 +211,30 @@ function like(post_id, info) {
         if (err) {
             console.log(err);
         } else {
+            myLikes++;
             console.log(body);
-            console.log(`已氵 ${++totalReplies} 帖.`);
-            log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `已点赞`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
+            log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `\r\n已点赞\r\n`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
         }
     });
 }
 
 // 是否已经点过赞
-async function isLiked(post_id) {
-    request({
-        url: `${IS_LIKED}/${post_id}?cid=&timestamp=${Math.random()}`,
-        method: 'GET'
-    }, (err, res, body) => {
-        let json = JSON.parse(body);
-        return json.data.is_liked;
-    })
+function isLiked(post_id) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: `${IS_LIKED}/${post_id}?cid=&timestamp=${Math.random()}`,
+            method: 'GET',
+            headers: {
+                'user-agent': USER_AGENT,
+                cookie: COOKIE,
+                origin: 'https://yuba.douyu.com',
+                referer: `https://yuba.douyu.com/p/${post_id}`
+            }
+        }, (err, res, body) => {
+            let json = JSON.parse(body);
+            resolve(json.data.is_liked);
+        })
+    });
 }
 
 // 水贴不回
@@ -224,9 +259,35 @@ function repeat(title) {
 
 // 强
 function good(title) {
-    for (let item of GOOD) {
-        if (~title.indexOf(item)) {
-            return `[强]`;
+    if (contains(title, GOOD)) {
+        return '[强]';
+    }
+}
+
+// 定义一系列回复
+function customizedReplies(title) {
+    if (contains(title, CHEER_UP)) {
+        return '加油 [奋斗]';
+    }
+    else if (contains(title, SONGS)) {
+        return '[鲨鱼好样的][鲨鱼好样的][鲨鱼好样的]';
+    }
+    else if (contains(title, BIRTHDAY)) {
+        return '生日快乐 [鲨鱼娘奈斯]';
+    }
+    else if (contains(title, WUWUWU)) {
+        return '摸摸~ [鲨鱼反向烟]';
+    }
+    else if (contains(title, DRIVER)) {
+        return '[开车][开车][开车]';
+    }
+}
+
+// 标题包含关键字
+function contains(title, arr) {
+    for (let word of arr) {
+        if (~title.indexOf(word)) {
+            return true;
         }
     }
     return false;

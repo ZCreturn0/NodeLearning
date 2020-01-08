@@ -4,6 +4,12 @@
 
 const request = require('request');
 const fs = require('fs');
+const mysql = require('mysql');
+const config = require('./db.json');
+const connection = mysql.createConnection(config);
+connection.connect();
+// 表名
+const TABLE_NAME = 'new_post202001';
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
 // 获取帖子回复URL(格式为 URL/post_id )
 const GET_REPLY_URL = 'https://yuba.douyu.com/wbapi/web/post/comments';
@@ -19,7 +25,7 @@ const INTERVAL = 5 * 1000;
 let CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
 // 关键字不回复
-const BAN_WORDS = ['即删', '自删', '水贴', '水', '氵贴', '氵', '冫'];
+const BAN_WORDS = ['即删', '自删', '水贴', '水', '氵贴', '氵', '冫', '氺'];
 // 复读机
 const REPEAT = ['早上好', '中午好', '晚上好', '早安', '午安', '晚安'];
 // 强
@@ -44,7 +50,7 @@ let myLikes = 0;
 const INDEX = 6;
 let index = 1;
 // cookie
-const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_auth=44122fe7fcb9faa9b61614a46ab4782c1e56288c; dy_auth=d231fJ2vAZrkFOozrcBL8wydk8roBmxG2LVYK355V6f6j%2FejTQvwZj1mByo6YhuvVDK4GoTJQ2L8zTSiZ4WsOkoTkRLV8cGMXjPamHHwpkM%2FK1ZVAglcNRs; wan_auth37wan=7faa9f8296e1YexN33QzRB4GZMbSgQBIxN9PTs9JqNJNUdY3wc1Lvh5ayM6ZfJOhHcHAYTzIOoTRrTbY9g3hAnDrH1u1%2BQD8wCjrVNnG0URfeQFK2zI; acf_yb_t=TPe5DPDSBN4U05zDLSvAJ9tNfHz97Ys7; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578200547,1578228787,1578230438,1578308905; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578308925; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578236057,1578237961,1578308943,1578308983; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578308983';
+const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_auth=44122fe7fcb9faa9b61614a46ab4782c1e56288c; dy_auth=d231fJ2vAZrkFOozrcBL8wydk8roBmxG2LVYK355V6f6j%2FejTQvwZj1mByo6YhuvVDK4GoTJQ2L8zTSiZ4WsOkoTkRLV8cGMXjPamHHwpkM%2FK1ZVAglcNRs; wan_auth37wan=7faa9f8296e1YexN33QzRB4GZMbSgQBIxN9PTs9JqNJNUdY3wc1Lvh5ayM6ZfJOhHcHAYTzIOoTRrTbY9g3hAnDrH1u1%2BQD8wCjrVNnG0URfeQFK2zI; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578230438,1578308905,1578394728,1578395388; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578395404; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578401851,1578402050,1578402188,1578402359; acf_yb_t=94rnpfbnG3C1k1523KU14V1J51fCHxHt; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578412840';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -132,7 +138,8 @@ function reply(post_id, content, info) {
         } else {
             console.log(body);
             console.log(`已氵 ${++totalReplies} 帖.`);
-            log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `回复: ${content}`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
+            // log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `回复: ${content}`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
+            log(post_id, info.title, info.author, 1, content, dateFormat('YYYY-mm-dd HH:MM:SS', new Date()));
         }
     });
 }
@@ -213,7 +220,8 @@ function like(post_id, info) {
         } else {
             myLikes++;
             console.log(body);
-            log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `\r\n已点赞\r\n`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
+            // log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `\r\n已点赞\r\n`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
+            log(post_id, info.title, info.author, 0, '已点赞', dateFormat('YYYY-mm-dd HH:MM:SS', new Date()));
         }
     });
 }
@@ -340,15 +348,15 @@ function dateFormat(fmt, date) {
 }
 
 // 打印日志
-function log(...msg) {
-    let str = msg.join('\r\n');
-    str = '--------------------------------------------------------------\r\n' + str + '\r\n--------------------------------------------------------------\r\n\r\n\r\n\r\n';
-    let today = dateFormat('YYYY-mm-dd', new Date());
-    fs.appendFile(`./log/${today}.txt`, str, 'utf-8', err => {
+function log(post_id, post_title, post_user, action, content, time) {
+    let sql = `INSERT INTO ${TABLE_NAME}(post_id, post_title, post_user, action, content, time) VALUES(?,?,?,?,?,?)`;
+    let sqlParams = [post_id, post_title, post_user, action, content, time];
+    connection.query(sql, sqlParams, (err, res) => {
         if (err) {
-            console.log(err);
-        } else {
-            console.log('done');
+            return;
+        }
+        else {
+            console.log(post_user, 'inserted');
         }
     });
 }

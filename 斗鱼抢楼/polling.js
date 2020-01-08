@@ -6,8 +6,7 @@ const request = require('request');
 const fs = require('fs');
 const mysql = require('mysql');
 const config = require('./db.json');
-const connection = mysql.createConnection(config);
-connection.connect();
+const POOL = mysql.createPool(config);
 // 表名
 const TABLE_NAME = 'new_post202001';
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
@@ -33,13 +32,13 @@ const GOOD = ['礼物', '系列'];
 // 加油
 const CHEER_UP = ['考试', '挑战', '复习', '加油'];
 // 歌单
-const SONGS = ['歌单', '网易', '总结', '年度', '来了', '跟风', '毛怪', '假粉'];
+// const SONGS = ['歌单', '网易', '总结', '年度', '来了', '跟风', '毛怪', '假粉'];
 // 生日
 const BIRTHDAY = ['生日', '长大一岁', '老了一岁'];
 // 呜呜呜
 const WUWUWU = ['呜呜呜', '1551'];
 // 开车
-const DRIVER = ['图', '喵', 'Hanser', 'hanser', '好日子', '新人', '憨八嘎', '哈哈', '好棒', '画', '唱', '天使'];
+const DRIVER = ['图', '喵', 'Hanser', 'hanser', '好日子', '新人', '憨八嘎', '哈哈', '好棒', '画', '唱', '天使', '毛怪'];
 // 新年好
 // const NEWYEAR2 = ['新年好', '新年快乐', '新的一年'];
 // 回帖数
@@ -138,7 +137,6 @@ function reply(post_id, content, info) {
         } else {
             console.log(body);
             console.log(`已氵 ${++totalReplies} 帖.`);
-            // log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `回复: ${content}`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
             log(post_id, info.title, info.author, 1, content, dateFormat('YYYY-mm-dd HH:MM:SS', new Date()));
         }
     });
@@ -220,7 +218,6 @@ function like(post_id, info) {
         } else {
             myLikes++;
             console.log(body);
-            // log(`id: ${post_id}`, `标题: ${info.title}`, `作者: ${info.author}`, `\r\n已点赞\r\n`, `时间: ${dateFormat('YYYY-mm-dd HH:MM:SS', new Date())}`);
             log(post_id, info.title, info.author, 0, '已点赞', dateFormat('YYYY-mm-dd HH:MM:SS', new Date()));
         }
     });
@@ -277,9 +274,9 @@ function customizedReplies(title) {
     if (contains(title, CHEER_UP)) {
         return '加油 [奋斗]';
     }
-    else if (contains(title, SONGS)) {
-        return '[鲨鱼好样的][鲨鱼好样的][鲨鱼好样的]';
-    }
+    // else if (contains(title, SONGS)) {
+    //     return '[鲨鱼好样的][鲨鱼好样的][鲨鱼好样的]';
+    // }
     else if (contains(title, BIRTHDAY)) {
         return '生日快乐 [鲨鱼娘奈斯]';
     }
@@ -351,13 +348,16 @@ function dateFormat(fmt, date) {
 function log(post_id, post_title, post_user, action, content, time) {
     let sql = `INSERT INTO ${TABLE_NAME}(post_id, post_title, post_user, action, content, time) VALUES(?,?,?,?,?,?)`;
     let sqlParams = [post_id, post_title, post_user, action, content, time];
-    connection.query(sql, sqlParams, (err, res) => {
-        if (err) {
-            return;
-        }
-        else {
-            console.log(post_user, 'inserted');
-        }
+    POOL.getConnection(async (err, connection) => {
+        await connection.query(sql, sqlParams, (err, res) => {
+            if (err) {
+                return;
+            }
+            else {
+                console.log(post_user, 'inserted');
+            }
+            connection.release();
+        });
     });
 }
 // makeMeeting();

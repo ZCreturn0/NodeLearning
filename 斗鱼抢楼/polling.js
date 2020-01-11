@@ -37,6 +37,8 @@ const CHEER_UP = ['考试', '挑战', '复习', '加油'];
 const BIRTHDAY = ['生日', '长大一岁', '老了一岁'];
 // 呜呜呜
 const WUWUWU = ['呜呜呜', '1551'];
+// 谁叫我
+const CALL_ME = ['吸憨'];
 // 开车
 const DRIVER = ['图', '喵', 'Hanser', 'hanser', '好日子', '新人', '憨八嘎', '哈哈', '好棒', '画', '唱', '天使', '毛怪'];
 // 新年好
@@ -49,7 +51,7 @@ let myLikes = 0;
 const INDEX = 6;
 let index = 1;
 // cookie
-const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_auth=44122fe7fcb9faa9b61614a46ab4782c1e56288c; dy_auth=d231fJ2vAZrkFOozrcBL8wydk8roBmxG2LVYK355V6f6j%2FejTQvwZj1mByo6YhuvVDK4GoTJQ2L8zTSiZ4WsOkoTkRLV8cGMXjPamHHwpkM%2FK1ZVAglcNRs; wan_auth37wan=7faa9f8296e1YexN33QzRB4GZMbSgQBIxN9PTs9JqNJNUdY3wc1Lvh5ayM6ZfJOhHcHAYTzIOoTRrTbY9g3hAnDrH1u1%2BQD8wCjrVNnG0URfeQFK2zI; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578230438,1578308905,1578394728,1578395388; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578395404; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578401851,1578402050,1578402188,1578402359; acf_yb_t=94rnpfbnG3C1k1523KU14V1J51fCHxHt; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578412840';
+const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_auth=55bad6259cbe1ba0470f5612fdc512f0ce666c0f; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578483876,1578568134,1578585662,1578655088; dy_auth=b3cfLP%2FM76c1At6AvDFvqVzSRRIIiMJ3S7A2B0OcPb0oeTI2IQgt4LbKSGKMiN64%2BoCaFr0mjNSiyUOifaXrfz8UT9Lj6e2eQBEqkxP5I%2BLylTemhjOlEf8; wan_auth37wan=fea8ecf3597dhrmQ8tpLB4WYgeqyhdW7jUal6p7u5vo2vu7nq%2BK8pWv5Sbce4wD2D8PoTuT6hcQQDTRU7E7aWpZRW10Dyig%2FG6VhshInOsExrE0yhDo; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578657952; acf_yb_t=94rnpfbnG3C1k1523KU14V1J51fCHxHt; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578665283,1578666415,1578671344,1578671439; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578671439';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -66,12 +68,20 @@ function go() {
             console.log('index:', index);
             // 遍历帖子
             for (let post of data) {
-                console.log('作者', post.nickname);
-                console.log('标题', post.title);
+                console.log('作者:', post.nickname);
+                console.log('标题:', post.title);
                 console.log('回复数:', post.comments);
                 console.log('-------------------------');
-                // 回复
-                // sendReply(post);
+                if (somebodyCalledMe(post.title)) {
+                    checkReplies(post.post_id, '[鲨鱼打扰了]', {
+                        author: post.nickname,
+                        title: post.title
+                    });
+                }
+                else {
+                    // 回复
+                    // sendReply(post);
+                }
                 if (!(await isLiked(post.post_id))) {
                     like(post.post_id, {
                         author: post.nickname,
@@ -145,7 +155,7 @@ function reply(post_id, content, info) {
 // 根据内容回复
 function sendReply(post) {
     // if (post.nickname == 'hanserLIVE') {
-    //     checkReplies(post.post_id, '[开车][开车][开车]', {
+    //     checkReplies(post.post_id, '蹲~ [开车][开车][开车]', {
     //         author: post.nickname,
     //         title: post.title
     //     });
@@ -156,45 +166,45 @@ function sendReply(post) {
     //         title: post.title
     //     });
     // }
-    if (post.nickname == '我会画本子135208') {
+    if(post.nickname == '我会画本子135208') {
         checkReplies(post.post_id, '冲冲冲~ [开车][开车]', {
             author: post.nickname,
             title: post.title
         });
     }
     else if (banned(post.title)) {
-        checkReplies(post.post_id, '一起冫一起冫[开车][开车]', {
+        checkReplies(post.post_id, '一起氺一起氺[开车][开车]', {
             author: post.nickname,
             title: post.title
         });
     }
     else {
-        if (index == INDEX) {
-            if (repeat(post.title)) {
-                checkReplies(post.post_id, repeat(post.title), {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-            else if (good(post.title)) {
-                checkReplies(post.post_id, good(post.title), {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-            else if (customizedReplies(post.title)) {
-                checkReplies(post.post_id, customizedReplies(post.title), {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-            else {
-                checkReplies(post.post_id, CONTENT, {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-        }
+        // if (index == INDEX) {
+        //     if (repeat(post.title)) {
+        //         checkReplies(post.post_id, repeat(post.title), {
+        //             author: post.nickname,
+        //             title: post.title
+        //         });
+        //     }
+        //     else if (good(post.title)) {
+        //         checkReplies(post.post_id, good(post.title), {
+        //             author: post.nickname,
+        //             title: post.title
+        //         });
+        //     }
+        //     else if (customizedReplies(post.title)) {
+        //         checkReplies(post.post_id, customizedReplies(post.title), {
+        //             author: post.nickname,
+        //             title: post.title
+        //         });
+        //     }
+        //     else {
+        //         // checkReplies(post.post_id, CONTENT, {
+        //         //     author: post.nickname,
+        //         //     title: post.title
+        //         // });
+        //     }
+        // }
     }
 }
 
@@ -240,6 +250,11 @@ function isLiked(post_id) {
             resolve(json.data.is_liked);
         })
     });
+}
+
+// 被召唤
+function somebodyCalledMe(title) {
+    return contains(title, CALL_ME);
 }
 
 // 水贴不回
@@ -348,8 +363,8 @@ function dateFormat(fmt, date) {
 function log(post_id, post_title, post_user, action, content, time) {
     let sql = `INSERT INTO ${TABLE_NAME}(post_id, post_title, post_user, action, content, time) VALUES(?,?,?,?,?,?)`;
     let sqlParams = [post_id, post_title, post_user, action, content, time];
-    POOL.getConnection(async (err, connection) => {
-        await connection.query(sql, sqlParams, (err, res) => {
+    POOL.getConnection((err, connection) => {
+        connection.query(sql, sqlParams, (err, res) => {
             if (err) {
                 return;
             }

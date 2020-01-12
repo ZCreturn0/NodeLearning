@@ -19,7 +19,7 @@ const IS_LIKED = 'https://yuba.douyu.com/wbapi/web/post/detail';
 // 前几楼回复
 const FLOOR = 5;
 // 刷新间隔
-const INTERVAL = 5 * 1000;
+const INTERVAL = 10 * 1000;
 // 回帖内容
 let CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
@@ -51,7 +51,7 @@ let myLikes = 0;
 const INDEX = 6;
 let index = 1;
 // cookie
-const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_auth=55bad6259cbe1ba0470f5612fdc512f0ce666c0f; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578483876,1578568134,1578585662,1578655088; dy_auth=b3cfLP%2FM76c1At6AvDFvqVzSRRIIiMJ3S7A2B0OcPb0oeTI2IQgt4LbKSGKMiN64%2BoCaFr0mjNSiyUOifaXrfz8UT9Lj6e2eQBEqkxP5I%2BLylTemhjOlEf8; wan_auth37wan=fea8ecf3597dhrmQ8tpLB4WYgeqyhdW7jUal6p7u5vo2vu7nq%2BK8pWv5Sbce4wD2D8PoTuT6hcQQDTRU7E7aWpZRW10Dyig%2FG6VhshInOsExrE0yhDo; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578657952; acf_yb_t=94rnpfbnG3C1k1523KU14V1J51fCHxHt; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578665283,1578666415,1578671344,1578671439; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578671439';
+const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_auth=55bad6259cbe1ba0470f5612fdc512f0ce666c0f; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=b3cfLP%2FM76c1At6AvDFvqVzSRRIIiMJ3S7A2B0OcPb0oeTI2IQgt4LbKSGKMiN64%2BoCaFr0mjNSiyUOifaXrfz8UT9Lj6e2eQBEqkxP5I%2BLylTemhjOlEf8; wan_auth37wan=fea8ecf3597dhrmQ8tpLB4WYgeqyhdW7jUal6p7u5vo2vu7nq%2BK8pWv5Sbce4wD2D8PoTuT6hcQQDTRU7E7aWpZRW10Dyig%2FG6VhshInOsExrE0yhDo; acf_yb_t=2Wlgn5SOYst7Y2ixp2YRWNCxZufIxU9F; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578742393,1578752672,1578762496,1578831972; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578831984; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578742539,1578762665,1578831980,1578832002; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578832002';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -373,6 +373,16 @@ function log(post_id, post_title, post_user, action, content, time) {
             }
             connection.release();
         });
+    });
+    let str = `id: ${post_id}\r\n标题: ${post_title}\r\n用户: ${post_user}\r\n\r\n${content}\r\n\r\n时间: ${time}`;
+    str = '--------------------------------------------------------------\r\n' + str + '\r\n--------------------------------------------------------------\r\n\r\n\r\n\r\n';
+    let today = dateFormat('YYYY-mm-dd', new Date());
+    fs.appendFile(`./log/${today}.txt`, str, 'utf-8', err => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('done');
+        }
     });
 }
 // makeMeeting();

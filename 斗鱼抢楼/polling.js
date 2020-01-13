@@ -6,7 +6,7 @@ const request = require('request');
 const fs = require('fs');
 const mysql = require('mysql');
 const config = require('./db.json');
-const POOL = mysql.createPool(config);
+const CONNECTION = mysql.createConnection(config);
 // 表名
 const TABLE_NAME = 'new_post202001';
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
@@ -19,7 +19,11 @@ const IS_LIKED = 'https://yuba.douyu.com/wbapi/web/post/detail';
 // 前几楼回复
 const FLOOR = 5;
 // 刷新间隔
-const INTERVAL = 5 * 1000;
+const INTERVAL = 10 * 1000;
+// 存入数据库间隔
+const SAVE_INTERVAL = 10 * 1000;
+// 每次存入的条数
+const CONSUME_SIZE = 5;
 // 回帖内容
 let CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
@@ -37,6 +41,8 @@ const CHEER_UP = ['考试', '挑战', '复习', '加油'];
 const BIRTHDAY = ['生日', '长大一岁', '老了一岁'];
 // 呜呜呜
 const WUWUWU = ['呜呜呜', '1551'];
+// 谁叫我
+const CALL_ME = ['吸憨'];
 // 开车
 const DRIVER = ['图', '喵', 'Hanser', 'hanser', '好日子', '新人', '憨八嘎', '哈哈', '好棒', '画', '唱', '天使', '毛怪'];
 // 新年好
@@ -48,8 +54,10 @@ let myLikes = 0;
 // 轮巡达到次数才回帖
 const INDEX = 6;
 let index = 1;
+// 缓存
+let cache = [];
 // cookie
-const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; acf_yb_auth=44122fe7fcb9faa9b61614a46ab4782c1e56288c; dy_auth=d231fJ2vAZrkFOozrcBL8wydk8roBmxG2LVYK355V6f6j%2FejTQvwZj1mByo6YhuvVDK4GoTJQ2L8zTSiZ4WsOkoTkRLV8cGMXjPamHHwpkM%2FK1ZVAglcNRs; wan_auth37wan=7faa9f8296e1YexN33QzRB4GZMbSgQBIxN9PTs9JqNJNUdY3wc1Lvh5ayM6ZfJOhHcHAYTzIOoTRrTbY9g3hAnDrH1u1%2BQD8wCjrVNnG0URfeQFK2zI; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578230438,1578308905,1578394728,1578395388; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578395404; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578401851,1578402050,1578402188,1578402359; acf_yb_t=94rnpfbnG3C1k1523KU14V1J51fCHxHt; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578412840';
+const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578532096,1578620915,1578710685,1578877626; acf_yb_auth=bf6d9f7ad9c85882f5efcd0cfe3b12bfcdf38ef2; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=7d02gednGIqWM%2B2kRv%2B6NA79TCdy2vaNWuIdnMU8gH18UGeeeJquzYo6T26Ay8P6XfyDJ8DZ%2FCYAlr2WqwZ9welPpQHHd8IGjtgsUZ432zUuX9u1Jgk7Wc8; wan_auth37wan=9cad9196dcbbF396blsjdI%2FFkuKP5Ehe2K4NZMKI8W7uwzHKtHR0e3jpNmJZIb0Ws022JNVLd4Mb3rFx6J0S%2BDCrtSVn2xuKoVBvozDGBqHw9g0DSvY; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578532106,1578621148,1578710979,1578877635; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578877635; acf_yb_t=61wQSK8knNZzktp29bq7QJlfvwxLw4Cn; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578887353';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -66,12 +74,20 @@ function go() {
             console.log('index:', index);
             // 遍历帖子
             for (let post of data) {
-                console.log('作者', post.nickname);
-                console.log('标题', post.title);
+                console.log('作者:', post.nickname);
+                console.log('标题:', post.title);
                 console.log('回复数:', post.comments);
                 console.log('-------------------------');
-                // 回复
-                // sendReply(post);
+                if (somebodyCalledMe(post.title)) {
+                    checkReplies(post.post_id, '[鲨鱼打扰了]', {
+                        author: post.nickname,
+                        title: post.title
+                    });
+                }
+                else {
+                    // 回复
+                    // sendReply(post);
+                }
                 if (!(await isLiked(post.post_id))) {
                     like(post.post_id, {
                         author: post.nickname,
@@ -145,7 +161,7 @@ function reply(post_id, content, info) {
 // 根据内容回复
 function sendReply(post) {
     // if (post.nickname == 'hanserLIVE') {
-    //     checkReplies(post.post_id, '[开车][开车][开车]', {
+    //     checkReplies(post.post_id, '蹲~ [开车][开车][开车]', {
     //         author: post.nickname,
     //         title: post.title
     //     });
@@ -156,45 +172,45 @@ function sendReply(post) {
     //         title: post.title
     //     });
     // }
-    if (post.nickname == '我会画本子135208') {
+    if(post.nickname == '我会画本子135208') {
         checkReplies(post.post_id, '冲冲冲~ [开车][开车]', {
             author: post.nickname,
             title: post.title
         });
     }
     else if (banned(post.title)) {
-        checkReplies(post.post_id, '一起冫一起冫[开车][开车]', {
+        checkReplies(post.post_id, '一起氺一起氺[开车][开车]', {
             author: post.nickname,
             title: post.title
         });
     }
     else {
-        if (index == INDEX) {
-            if (repeat(post.title)) {
-                checkReplies(post.post_id, repeat(post.title), {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-            else if (good(post.title)) {
-                checkReplies(post.post_id, good(post.title), {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-            else if (customizedReplies(post.title)) {
-                checkReplies(post.post_id, customizedReplies(post.title), {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-            else {
-                checkReplies(post.post_id, CONTENT, {
-                    author: post.nickname,
-                    title: post.title
-                });
-            }
-        }
+        // if (index == INDEX) {
+        //     if (repeat(post.title)) {
+        //         checkReplies(post.post_id, repeat(post.title), {
+        //             author: post.nickname,
+        //             title: post.title
+        //         });
+        //     }
+        //     else if (good(post.title)) {
+        //         checkReplies(post.post_id, good(post.title), {
+        //             author: post.nickname,
+        //             title: post.title
+        //         });
+        //     }
+        //     else if (customizedReplies(post.title)) {
+        //         checkReplies(post.post_id, customizedReplies(post.title), {
+        //             author: post.nickname,
+        //             title: post.title
+        //         });
+        //     }
+        //     else {
+        //         // checkReplies(post.post_id, CONTENT, {
+        //         //     author: post.nickname,
+        //         //     title: post.title
+        //         // });
+        //     }
+        // }
     }
 }
 
@@ -240,6 +256,11 @@ function isLiked(post_id) {
             resolve(json.data.is_liked);
         })
     });
+}
+
+// 被召唤
+function somebodyCalledMe(title) {
+    return contains(title, CALL_ME);
 }
 
 // 水贴不回
@@ -346,19 +367,43 @@ function dateFormat(fmt, date) {
 
 // 打印日志
 function log(post_id, post_title, post_user, action, content, time) {
-    let sql = `INSERT INTO ${TABLE_NAME}(post_id, post_title, post_user, action, content, time) VALUES(?,?,?,?,?,?)`;
-    let sqlParams = [post_id, post_title, post_user, action, content, time];
-    POOL.getConnection(async (err, connection) => {
-        await connection.query(sql, sqlParams, (err, res) => {
-            if (err) {
-                return;
-            }
-            else {
-                console.log(post_user, 'inserted');
-            }
-            connection.release();
-        });
+    cache.push({
+        post_id, post_title, post_user, action, content, time
     });
+    logToFile(post_id, post_title, post_user, action, content, time);
+}
+
+// 输出日志到文件
+function logToFile(post_id, post_title, post_user, action, content, time) {
+    let str = `id: ${post_id}\r\n标题: ${post_title}\r\n用户: ${post_user}\r\n\r\n${content}\r\n\r\n时间: ${time}`;
+    str = '--------------------------------------------------------------\r\n' + str + '\r\n--------------------------------------------------------------\r\n\r\n\r\n\r\n';
+    let today = dateFormat('YYYY-mm-dd', new Date());
+    fs.appendFile(`./log/${today}.txt`, str, 'utf-8', err => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('done');
+        }
+    });
+}
+
+// 输出日志到数据库
+function logToDatabase() {
+    let chunk = cache.splice(0, CONSUME_SIZE);
+    if (chunk.length) {
+        chunk.forEach(post => {
+            let sql = `INSERT INTO ${TABLE_NAME}(post_id, post_title, post_user, action, content, time) VALUES(?,?,?,?,?,?)`;
+            let sqlParams = [post.post_id, post.post_title, post.post_user, post.action, post.content, post.time];
+            CONNECTION.query(sql, sqlParams, (err, res) => {
+                if (err) {
+                    return;
+                }
+                else {
+                    console.log(post_user, 'inserted');
+                }
+            });
+        });
+    }
 }
 // makeMeeting();
 // setInterval(makeMeeting, 10 * 60 * 1000);
@@ -378,4 +423,12 @@ async function start() {
     }
 }
 
+async function saveLog() {
+    while (true) {
+        logToDatabase();
+        await sleep(SAVE_INTERVAL);
+    }
+}
+
 start();
+saveLog();

@@ -6,7 +6,7 @@ const request = require('request');
 const fs = require('fs');
 const mysql = require('mysql');
 const config = require('./db.json');
-const POOL = mysql.createPool(config);
+const CONNECTION = mysql.createConnection(config);
 // 表名
 const TABLE_NAME = 'new_post202001';
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
@@ -20,6 +20,10 @@ const IS_LIKED = 'https://yuba.douyu.com/wbapi/web/post/detail';
 const FLOOR = 5;
 // 刷新间隔
 const INTERVAL = 10 * 1000;
+// 存入数据库间隔
+const SAVE_INTERVAL = 10 * 1000;
+// 每次存入的条数
+const CONSUME_SIZE = 5;
 // 回帖内容
 let CONTENT = '[发呆]';
 const ME = '疯狂吸憨';
@@ -50,8 +54,10 @@ let myLikes = 0;
 // 轮巡达到次数才回帖
 const INDEX = 6;
 let index = 1;
+// 缓存
+let cache = [];
 // cookie
-const COOKIE = 'dy_did=c786786def77d12e7493668900061501; smidV2=20180715181308687271adbb23af468dfd1599c204d1ec0088c3a3a660769e0; acf_yb_did=c786786def77d12e7493668900061501; _ga=GA1.2.365818811.1542716072; acf_yb_auth=55bad6259cbe1ba0470f5612fdc512f0ce666c0f; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=b3cfLP%2FM76c1At6AvDFvqVzSRRIIiMJ3S7A2B0OcPb0oeTI2IQgt4LbKSGKMiN64%2BoCaFr0mjNSiyUOifaXrfz8UT9Lj6e2eQBEqkxP5I%2BLylTemhjOlEf8; wan_auth37wan=fea8ecf3597dhrmQ8tpLB4WYgeqyhdW7jUal6p7u5vo2vu7nq%2BK8pWv5Sbce4wD2D8PoTuT6hcQQDTRU7E7aWpZRW10Dyig%2FG6VhshInOsExrE0yhDo; acf_yb_t=2Wlgn5SOYst7Y2ixp2YRWNCxZufIxU9F; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578742393,1578752672,1578762496,1578831972; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578831984; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578742539,1578762665,1578831980,1578832002; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578832002';
+const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; acf_yb_auth=bf6d9f7ad9c85882f5efcd0cfe3b12bfcdf38ef2; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=7d02gednGIqWM%2B2kRv%2B6NA79TCdy2vaNWuIdnMU8gH18UGeeeJquzYo6T26Ay8P6XfyDJ8DZ%2FCYAlr2WqwZ9welPpQHHd8IGjtgsUZ432zUuX9u1Jgk7Wc8; wan_auth37wan=9cad9196dcbbF396blsjdI%2FFkuKP5Ehe2K4NZMKI8W7uwzHKtHR0e3jpNmJZIb0Ws022JNVLd4Mb3rFx6J0S%2BDCrtSVn2xuKoVBvozDGBqHw9g0DSvY; acf_yb_t=61wQSK8knNZzktp29bq7QJlfvwxLw4Cn; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578620915,1578710685,1578877626,1578962969; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578710979,1578877635,1578967169,1578980482; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578980496; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578988133';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -361,19 +367,14 @@ function dateFormat(fmt, date) {
 
 // 打印日志
 function log(post_id, post_title, post_user, action, content, time) {
-    let sql = `INSERT INTO ${TABLE_NAME}(post_id, post_title, post_user, action, content, time) VALUES(?,?,?,?,?,?)`;
-    let sqlParams = [post_id, post_title, post_user, action, content, time];
-    POOL.getConnection((err, connection) => {
-        connection.query(sql, sqlParams, (err, res) => {
-            if (err) {
-                return;
-            }
-            else {
-                console.log(post_user, 'inserted');
-            }
-            connection.release();
-        });
+    cache.push({
+        post_id, post_title, post_user, action, content, time
     });
+    logToFile(post_id, post_title, post_user, action, content, time);
+}
+
+// 输出日志到文件
+function logToFile(post_id, post_title, post_user, action, content, time) {
     let str = `id: ${post_id}\r\n标题: ${post_title}\r\n用户: ${post_user}\r\n\r\n${content}\r\n\r\n时间: ${time}`;
     str = '--------------------------------------------------------------\r\n' + str + '\r\n--------------------------------------------------------------\r\n\r\n\r\n\r\n';
     let today = dateFormat('YYYY-mm-dd', new Date());
@@ -384,6 +385,25 @@ function log(post_id, post_title, post_user, action, content, time) {
             console.log('done');
         }
     });
+}
+
+// 输出日志到数据库
+function logToDatabase() {
+    let chunk = cache.splice(0, CONSUME_SIZE);
+    if (chunk.length) {
+        chunk.forEach(post => {
+            let sql = `INSERT INTO ${TABLE_NAME}(post_id, post_title, post_user, action, content, time) VALUES(?,?,?,?,?,?)`;
+            let sqlParams = [post.post_id, post.post_title, post.post_user, post.action, post.content, post.time];
+            CONNECTION.query(sql, sqlParams, (err, res) => {
+                if (err) {
+                    return;
+                }
+                else {
+                    console.log(post.post_user, 'inserted');
+                }
+            });
+        });
+    }
 }
 // makeMeeting();
 // setInterval(makeMeeting, 10 * 60 * 1000);
@@ -403,4 +423,12 @@ async function start() {
     }
 }
 
+async function saveLog() {
+    while (true) {
+        logToDatabase();
+        await sleep(SAVE_INTERVAL);
+    }
+}
+
 start();
+saveLog();

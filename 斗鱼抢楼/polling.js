@@ -7,7 +7,7 @@ const fs = require('fs');
 const mysql = require('mysql');
 const config = require('./db.json');
 const CONNECTION = mysql.createConnection(config);
-// 表名
+// 表名 
 const TABLE_NAME = 'new_post202001';
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
 // 获取帖子回复URL(格式为 URL/post_id )

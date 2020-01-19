@@ -7,7 +7,7 @@ const fs = require('fs');
 const mysql = require('mysql');
 const config = require('./db.json');
 const CONNECTION = mysql.createConnection(config);
-// 表名
+// 表名 
 const TABLE_NAME = 'new_post202001';
 const POST_LIST_URL = 'https://yuba.douyu.com/wbapi/web/group/postlist?group_id=765880&page=1&sort=1';
 // 获取帖子回复URL(格式为 URL/post_id )
@@ -57,7 +57,7 @@ let index = 1;
 // 缓存
 let cache = [];
 // cookie
-const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; acf_yb_auth=bf6d9f7ad9c85882f5efcd0cfe3b12bfcdf38ef2; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=7d02gednGIqWM%2B2kRv%2B6NA79TCdy2vaNWuIdnMU8gH18UGeeeJquzYo6T26Ay8P6XfyDJ8DZ%2FCYAlr2WqwZ9welPpQHHd8IGjtgsUZ432zUuX9u1Jgk7Wc8; wan_auth37wan=9cad9196dcbbF396blsjdI%2FFkuKP5Ehe2K4NZMKI8W7uwzHKtHR0e3jpNmJZIb0Ws022JNVLd4Mb3rFx6J0S%2BDCrtSVn2xuKoVBvozDGBqHw9g0DSvY; acf_yb_t=61wQSK8knNZzktp29bq7QJlfvwxLw4Cn; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578620915,1578710685,1578877626,1578962969; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578710979,1578877635,1578967169,1578980482; Hm_lpvt_e99aee90ec1b2106afe7ec3b199020a7=1578980496; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1578988133';
+const COOKIE = 'smidV2=2019100911115245d4a9e1bd276ad8cb6f57bd8e5275cf009cc7ab561c547e0; dy_did=64a637aa8d4b267801d704be00091501; acf_yb_did=64a637aa8d4b267801d704be00091501; acf_yb_auth=bf6d9f7ad9c85882f5efcd0cfe3b12bfcdf38ef2; acf_yb_new_uid=JGdyepZy9QdX; acf_yb_uid=245644962; dy_auth=7d02gednGIqWM%2B2kRv%2B6NA79TCdy2vaNWuIdnMU8gH18UGeeeJquzYo6T26Ay8P6XfyDJ8DZ%2FCYAlr2WqwZ9welPpQHHd8IGjtgsUZ432zUuX9u1Jgk7Wc8; wan_auth37wan=9cad9196dcbbF396blsjdI%2FFkuKP5Ehe2K4NZMKI8W7uwzHKtHR0e3jpNmJZIb0Ws022JNVLd4Mb3rFx6J0S%2BDCrtSVn2xuKoVBvozDGBqHw9g0DSvY; acf_yb_t=61wQSK8knNZzktp29bq7QJlfvwxLw4Cn; Hm_lvt_e99aee90ec1b2106afe7ec3b199020a7=1578877635,1578967169,1578980482,1579051555; Hm_lvt_e0374aeb9ac41bee98043654e36ad504=1578877626,1578962969,1579051327,1579135975; Hm_lpvt_e0374aeb9ac41bee98043654e36ad504=1579135983';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
 
 function go() {
@@ -253,7 +253,9 @@ function isLiked(post_id) {
             }
         }, (err, res, body) => {
             let json = JSON.parse(body);
-            resolve(json.data.is_liked);
+            if (json) {
+                resolve(json.data.is_liked);
+            }
         })
     });
 }
